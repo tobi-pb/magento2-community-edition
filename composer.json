@@ -2,7 +2,11 @@
     "name": "magento/product-community-edition",
     "description": "eCommerce Platform for Growth (Community Edition)",
     "type": "project",
-    "version": "0.1.0-alpha107",
+    "version": "0.1.0-alpha108",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
     "require": {
         "php": "~5.4.11|~5.5.0",
         "zendframework/zend-stdlib": "2.3.1",
@@ -11,7 +15,22 @@
         "zendframework/zend-soap": "2.3.1",
         "zendframework/zend-uri": "2.3.1",
         "zendframework/zend-validator": "2.3.1",
+        "zendframework/zend-console": "2.3.1",
+        "zendframework/zend-modulemanager": "2.3.1",
+        "zendframework/zend-mvc": "2.3.1",
+        "zendframework/zend-text": "2.3.1",
+        "zendframework/zend-eventmanager": "2.3.1",
+        "zendframework/zend-view": "2.3.1",
+        "zendframework/zend-servicemanager": "2.3.1",
+        "zendframework/zend-json": "2.3.1",
+        "zendframework/zend-config": "2.3.1",
+        "zendframework/zend-form": "2.3.1",
+        "zendframework/zend-di": "2.3.1",
+        "zendframework/zend-serializer": "2.3.1",
+        "zendframework/zend-log": "2.3.1",
+        "zendframework/zend-http": "2.3.1",
         "magento/zendframework1": "1.12.9",
+        "composer/composer": "1.0.0-alpha8",
         "magento/magento2-base": "self.version",
         "magento/module-admin-notification": "self.version",
         "magento/module-authorization": "self.version",
@@ -26,6 +45,7 @@
         "magento/module-catalog-rule": "self.version",
         "magento/module-catalog-search": "self.version",
         "magento/module-catalog-url-rewrite": "self.version",
+        "magento/module-catalog-widget": "self.version",
         "magento/module-centinel": "self.version",
         "magento/module-checkout": "self.version",
         "magento/module-checkout-agreements": "self.version",
@@ -65,12 +85,10 @@
         "magento/module-offline-shipping": "self.version",
         "magento/module-ogone": "self.version",
         "magento/module-page-cache": "self.version",
-        "magento/module-pay-pal-recurring-payment": "self.version",
         "magento/module-payment": "self.version",
         "magento/module-paypal": "self.version",
         "magento/module-persistent": "self.version",
         "magento/module-product-alert": "self.version",
-        "magento/module-recurring-payment": "self.version",
         "magento/module-reports": "self.version",
         "magento/module-require-js": "self.version",
         "magento/module-review": "self.version",
@@ -111,7 +129,19 @@
     "require-dev": {
         "phpunit/phpunit": "4.1.0",
         "squizlabs/php_codesniffer": "1.5.3",
-        "phpmd/phpmd": "@stable"
+        "phpmd/phpmd": "@stable",
+        "lib-libxml": "*",
+        "ext-ctype": "*",
+        "ext-gd": "*",
+        "ext-spl": "*",
+        "ext-dom": "*",
+        "ext-simplexml": "*",
+        "ext-mcrypt": "*",
+        "ext-hash": "*",
+        "ext-curl": "*",
+        "ext-iconv": "*",
+        "sjparkinson/static-review": "~4.1",
+        "fabpot/php-cs-fixer": "~1.2"
     },
     "config": {
         "use-include-path": true
@@ -129,13 +159,10 @@
             "Magento\\Tools\\Sanity\\": "dev/build/publication/sanity/Magento/Tools/Sanity/",
             "Magento\\TestFramework\\Inspection\\": "dev/tests/static/framework/Magento/TestFramework/Inspection/",
             "Magento\\TestFramework\\Utility\\": "dev/tests/static/framework/Magento/TestFramework/Utility/",
-            "Magento\\ToolkitFramework\\": "dev/tools/performance-toolkit/framework/Magento/ToolkitFramework/"
+            "Magento\\ToolkitFramework\\": "dev/tools/performance-toolkit/framework/Magento/ToolkitFramework/",
+            "Magento\\Setup\\": "setup/module/Magento/Setup/src/"
         }
     },
-    "license": [
-        "OSL-3.0",
-        "AFL-3.0"
-    ],
     "repositories": [
         {
             "type": "composer",
