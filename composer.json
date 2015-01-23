@@ -2,7 +2,7 @@
     "name": "magento/product-community-edition",
     "description": "eCommerce Platform for Growth (Community Edition)",
     "type": "project",
-    "version": "0.42.0-beta4",
+    "version": "0.42.0-beta5",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
@@ -87,6 +87,7 @@
         "magento/module-payment": "self.version",
         "magento/module-persistent": "self.version",
         "magento/module-product-alert": "self.version",
+        "magento/module-quote": "self.version",
         "magento/module-reports": "self.version",
         "magento/module-require-js": "self.version",
         "magento/module-review": "self.version",
