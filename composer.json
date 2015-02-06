@@ -2,13 +2,13 @@
     "name": "magento/product-community-edition",
     "description": "eCommerce Platform for Growth (Community Edition)",
     "type": "project",
-    "version": "0.42.0-beta6",
+    "version": "0.42.0-beta7",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
     ],
     "require": {
-        "php": "~5.4.11|~5.5.0|~5.6.0",
+        "php": "~5.5.0|~5.6.0",
         "zendframework/zend-stdlib": "2.3.1",
         "zendframework/zend-code": "2.3.1",
         "zendframework/zend-server": "2.3.1",
@@ -32,6 +32,7 @@
         "magento/zendframework1": "1.12.9-patch1",
         "composer/composer": "1.0.0-alpha8",
         "monolog/monolog": "1.11.0",
+        "tubalmartin/cssmin": "2.4.8-p4",
         "magento/magento2-base": "self.version",
         "magento/module-admin-notification": "self.version",
         "magento/module-authorization": "self.version",
@@ -160,7 +161,7 @@
             "Magento\\TestFramework\\Inspection\\": "dev/tests/static/framework/Magento/TestFramework/Inspection/",
             "Magento\\TestFramework\\Utility\\": "dev/tests/static/framework/Magento/TestFramework/Utility/",
             "Magento\\ToolkitFramework\\": "dev/tools/performance-toolkit/framework/Magento/ToolkitFramework/",
-            "Magento\\Setup\\": "setup/module/Magento/Setup/src/"
+            "Magento\\Setup\\": "setup/src/Magento/Setup/"
         }
     },
     "repositories": [
