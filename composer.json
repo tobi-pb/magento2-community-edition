@@ -2,6 +2,7 @@
     "name": "magento/updater",
     "description": "Magento Updater",
     "type": "project",
+    "version": "0.01",
     "license": [
         "OSL-3.0",
         "AFL-3.0"

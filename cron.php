@@ -1,7 +1,5 @@
 <?php
 /**
- * Create/Update .update_status.txt with current date and time.
- *
  * Copyright © 2015 Magento. All rights reserved.
  * See COPYING.txt for license details.
  */
