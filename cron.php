@@ -6,8 +6,9 @@
  * See COPYING.txt for license details.
  */
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 $updateStatusFile = fopen(__DIR__ . '/var/.update_status.txt', 'w');
-date_default_timezone_set('UTC');
-$currentDate = date('m/d/Y h:i:s a', time());
-fwrite($updateStatusFile, $currentDate);
+$demoObject = new Magento\DemoClass();
+fwrite($updateStatusFile, $demoObject->getCurrentDateTime());
 fclose($updateStatusFile);

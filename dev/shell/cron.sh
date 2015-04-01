@@ -5,7 +5,7 @@
 if [ ! "$1" = "" ] ; then
 CRONSCRIPT=$1
 else
-CRONSCRIPT=update/cron.php
+CRONSCRIPT=cron.php
 fi
 
 PHP_BIN=`which php`

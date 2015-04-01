@@ -7,8 +7,14 @@
         "AFL-3.0"
     ],
     "require": {
-        "php": "~5.5.0|~5.6.0",
-        "symfony/console": "~2.3",
-        "symfony/process": "~2.1"
+        "php": "~5.5.0|~5.6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Magento\\": "app/code/Magento/"
+        }
     }
 }

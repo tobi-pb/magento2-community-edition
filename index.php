@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 $filename = 'var/.update_status.txt';
 $headerText = 'Last Update';
 $messageText = '';
