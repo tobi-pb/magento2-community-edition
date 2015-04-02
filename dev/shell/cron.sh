@@ -4,4 +4,6 @@
 
 CRONSCRIPT="../../cron.php"
 PHP_BIN=`which php`
-$PHP_BIN $CRONSCRIPT &
+if  ! ps auxwww | grep " $CRONSCRIPT" | grep -v grep | grep -v cron.sh 1>/dev/null 2>/dev/null ; then
+    $PHP_BIN $CRONSCRIPT &
+fi
