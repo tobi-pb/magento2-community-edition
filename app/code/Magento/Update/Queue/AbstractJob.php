@@ -17,7 +17,7 @@ abstract class AbstractJob
     protected $name;
 
     /**
-     * @var array
+     * @var object
      */
     protected $params;
 
@@ -25,9 +25,9 @@ abstract class AbstractJob
      * Initialize job instance.
      *
      * @param string $name
-     * @param array $params
+     * @param object $params
      */
-    public function __construct($name, array $params)
+    public function __construct($name, $params)
     {
         $this->name = $name;
         $this->params = $params;

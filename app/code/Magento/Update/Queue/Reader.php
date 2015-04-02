@@ -30,6 +30,7 @@ class Reader
      * Read Magento updater application jobs queue as a JSON string.
      *
      * @return string Queue file content (valid JSON string)
+     * @throws \RuntimeException
      */
     public function read()
     {
@@ -40,8 +41,8 @@ class Reader
         $queueFileContent = file_get_contents($this->queueFilePath);
         if ($queueFileContent) {
             json_decode($queueFileContent);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                throw new \UnexpectedValueException(sprintf('Content of "%1" must a valid JSON.', $queueFileContent));
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \RuntimeException(sprintf('Content of "%s" must a valid JSON.', $this->queueFilePath));
             }
             $queue = $queueFileContent;
         }
@@ -60,7 +61,7 @@ class Reader
             $isClearedSuccessfully = (false !== file_put_contents($this->queueFilePath, ''));
             if (!$isClearedSuccessfully) {
                 throw new \RuntimeException(
-                    sprintf('Magento updater application jobs queue file "%1" cannot be cleared.', $this->queueFilePath)
+                    sprintf('Magento updater application jobs queue file "%s" cannot be cleared.', $this->queueFilePath)
                 );
             }
         }

@@ -51,17 +51,23 @@ class Queue
      * Note, that this method is idempotent, queue will be cleared after its execution
      *
      * @return AbstractJob[]
+     * @throws \RuntimeException
      */
     public function popQueuedJobs()
     {
         $jobs = [];
         $queue = json_decode($this->reader->read());
+        if (!is_object($queue)) {
+            return $jobs;
+        }
         if (isset($queue->{self::KEY_JOBS}) && is_array($queue->{self::KEY_JOBS})) {
             /** @var object $job */
             foreach ($queue->{self::KEY_JOBS} as $job) {
                 $this->validateJobDeclaration($job);
                 $jobs[] = $this->jobFactory->create($job->{self::KEY_JOB_NAME}, $job->{self::KEY_JOB_PARAMS});
             }
+        } else {
+            throw new \RuntimeException(sprintf('"%s" field is missing or is not an array.', self::KEY_JOBS));
         }
         $this->reader->clearQueue();
         return $jobs;
@@ -78,7 +84,7 @@ class Queue
         $requiredFields = [self::KEY_JOB_NAME, self::KEY_JOB_PARAMS];
         foreach ($requiredFields as $field) {
             if (!isset($job->{$field})) {
-                throw new \RuntimeException(sprintf('"%1" is missing for one or more jobs.', $field));
+                throw new \RuntimeException(sprintf('"%s" field is missing for one or more jobs.', $field));
             }
         }
     }

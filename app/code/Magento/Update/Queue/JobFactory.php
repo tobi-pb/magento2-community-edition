@@ -24,10 +24,11 @@ class JobFactory
      * Create job instance.
      *
      * @param string $name
-     * @param array $params
+     * @param object $params
      * @return AbstractJob
+     * @throws \RuntimeException
      */
-    public function create($name, array $params)
+    public function create($name, $params)
     {
         switch ($name) {
             case self::NAME_UPDATE:
@@ -45,7 +46,7 @@ class JobFactory
             default:
                 throw new \RuntimeException(
                     sprintf(
-                        '"%1" job is not supported. The following jobs are supported: %2.',
+                        '"%s" job is not supported. The following jobs are supported: %s.',
                         $name,
                         implode(', ', self::getListOfSupportedJobs())
                     )
