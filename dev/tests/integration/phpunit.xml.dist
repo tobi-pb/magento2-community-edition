@@ -10,7 +10,7 @@
          colors="true"
          bootstrap="./framework/bootstrap.php"
         >
-    <testsuite name="Magento Setup Application Unit Tests">
+    <testsuite name="Magento Setup Application Integration Tests">
         <directory suffix="Test.php">testsuite</directory>
     </testsuite>
     <php>
