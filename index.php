@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/app/bootstrap.php';
 
 $headerText = 'Last Update';
 $messageText = file_get_contents('var/.update_status.txt');

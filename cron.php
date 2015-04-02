@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/app/bootstrap.php';
 
 $updateStatusFile = fopen(__DIR__ . '/var/.update_status.txt', 'w');
 $demoObject = new Magento\DemoClass();
