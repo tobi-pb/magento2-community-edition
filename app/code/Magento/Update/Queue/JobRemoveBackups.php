@@ -11,14 +11,29 @@ namespace Magento\Update\Queue;
  */
 class JobRemoveBackups extends AbstractJob
 {
-    // TODO: Add job specific getters and there initialization based on construct params in scope of https://jira.corp.x.com/browse/MAGETWO-35330
+    const BACKUPS_FILE_NAMES = 'backups_file_names';
+    const MAINTENANCE_FLAG_FILE = '/var/.maintenance.flag';
+    const UPDATE_ERROR_FLAG_FILE = '/var/.update_error.flag';
 
     /**
      * {@inheritdoc}
      */
     public function execute()
     {
-        // TODO: Implement execute() method.
+        if (file_exists(UPDATER_BP . self::MAINTENANCE_FLAG_FILE) ||
+            file_exists(UPDATER_BP . self::UPDATE_ERROR_FLAG_FILE)) {
+            throw new \Exception("Cannot remove archives while setup is in progress");
+            return;
+        }
+        $filesToDelete = [];
+        if (isset($this->params[self::BACKUPS_FILE_NAMES])) {
+            $filesToDelete = $this->params[self::BACKUPS_FILE_NAMES];
+        }
+        foreach ($filesToDelete as $file) {
+            if (!file_exists($file) || !unlink($file)) {
+                throw new \Exception("Could not delete backup archive " . $file);
+            }
+        }
         return $this;
     }
 }
