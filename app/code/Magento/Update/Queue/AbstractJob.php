@@ -6,6 +6,8 @@
 
 namespace Magento\Update\Queue;
 
+use \Magento\Update\Status;
+
 /**
  * Magento updater application abstract job.
  */
@@ -22,15 +24,22 @@ abstract class AbstractJob
     protected $params;
 
     /**
+     * @var \Magento\Update\Status
+     */
+    protected $jobStatus;
+
+    /**
      * Initialize job instance.
      *
      * @param string $name
      * @param object $params
+     * @param \Magento\Update\Status $jobStatus
      */
-    public function __construct($name, $params)
+    public function __construct($name, $params, $jobStatus = null)
     {
         $this->name = $name;
         $this->params = $params;
+        $this->jobStatus = $jobStatus ? $jobStatus : new Status();
     }
 
     /**
