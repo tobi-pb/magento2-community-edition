@@ -8,7 +8,7 @@ namespace Magento\Update;
 
 class Rollback
 {
-    const BACKUP_DIR = 'var/backup/';
+    const BACKUP_DIR = '../../../../var/backup/';
     const FILE_DIR = "../../../../..";
     const EXIT_COMMAND = 'quit';
     const INPUT_PATTERN = '^([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2})$';
