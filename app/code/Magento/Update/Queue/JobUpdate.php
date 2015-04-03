@@ -11,4 +11,12 @@ namespace Magento\Update\Queue;
  */
 class JobUpdate extends AbstractJob
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function execute()
+    {
+        // TODO: Implement execute() method.
+        return $this;
+    }
 }

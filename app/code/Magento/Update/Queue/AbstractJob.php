@@ -42,4 +42,11 @@ abstract class AbstractJob
     {
         return $this->name;
     }
+
+    /**
+     * Execute job.
+     *
+     * @return $this
+     */
+    abstract public function execute();
 }
