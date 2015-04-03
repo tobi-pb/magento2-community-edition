@@ -43,7 +43,34 @@ class Status
      */
     public function get($maxNumberOfLines = null, $lineLengthLimit = 120)
     {
-        return 'Lorem ipsum dolor sit amet';
+        $status = '';
+        $fullStatusArray = file($this->statusFilePath);
+        if ($fullStatusArray) {
+            $linesInFile = count($fullStatusArray);
+            if (!$maxNumberOfLines || ($maxNumberOfLines > $linesInFile)) {
+                $maxNumberOfLines = $linesInFile;
+            }
+            $totalNumberOfLinesOnDisplay = 0;
+            $totalLinesToRead = $maxNumberOfLines;
+            for ($currentLineNumber = 1; $currentLineNumber <= $maxNumberOfLines; $currentLineNumber++) {
+                $lineLength = strlen($fullStatusArray[$linesInFile - $currentLineNumber]);
+                /** Line length is at least 1 because of new line character, so ceil should evaluate at least to 1 */
+                $numberOfLinesOnDisplay = ceil($lineLength / $lineLengthLimit);
+                $totalNumberOfLinesOnDisplay += $numberOfLinesOnDisplay;
+                if ($numberOfLinesOnDisplay > 1) {
+                    $totalLinesToRead -= $numberOfLinesOnDisplay - 1;
+                    if ($totalLinesToRead < $currentLineNumber) {
+                        $totalLinesToRead = $currentLineNumber;
+                    }
+                }
+                if ($totalNumberOfLinesOnDisplay > $maxNumberOfLines) {
+                    break;
+                }
+            }
+            $slicedStatusArray = array_slice($fullStatusArray, -$totalLinesToRead, $totalLinesToRead);
+            $status = implode('', $slicedStatusArray);
+        }
+        return $status;
     }
 
     /**
