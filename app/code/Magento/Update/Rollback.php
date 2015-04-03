@@ -11,7 +11,7 @@ class Rollback
     const BACKUP_DIR = '../../../../var/backup/';
     const FILE_DIR = "../../../../..";
     const EXIT_COMMAND = 'quit';
-    const INPUT_PATTERN = '^([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2})$';
+    const INPUT_PATTERN = '/^([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2})$/';
 
     /**
      * Manual rollback to a archive version specified by user
