@@ -20,15 +20,15 @@ if (!$updateInProgressFlagFile) {
 /** @var \Magento\Update\Queue $jobQueue */
 $jobQueue = new \Magento\Update\Queue();
 
-/** @var \Magento\Update\Status $jobLog */
-$jobLog = new \Magento\Update\Status();
+/** @var \Magento\Update\Status $jobStatus */
+$jobStatus = new \Magento\Update\Status();
 
 /** @var \Magento\Update\Queue\AbstractJob $job*/
 foreach ($jobQueue->popQueuedJobs() as $job) {
     try {
         $job->execute();
     } catch (Exception $e) {
-        $jobLog->add(sprintf('An error occurred while executing job %s: %s', $job->getName(), $e->getMessage()));
+        $jobStatus->add(sprintf('An error occurred while executing job %s: %s', $job->getName(), $e->getMessage()));
     }
 }
 fclose($updateInProgressFlagFile);
