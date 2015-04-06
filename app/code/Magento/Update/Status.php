@@ -99,7 +99,7 @@ class Status
     {
         /** Add status to permanent log file for future analysis and reference. */
         if (false === file_put_contents($this->logFilePath, "\n{$text}", FILE_APPEND)) {
-            throw new \RuntimeException('Cannot write status information to "%s"', $this->statusFilePath);
+            throw new \RuntimeException(sprintf('Cannot write status information to "%s"', $this->statusFilePath));
         }
 
         /** Add status for display on the web page. */
@@ -107,7 +107,7 @@ class Status
             $text = "\n{$text}";
         }
         if (false === file_put_contents($this->statusFilePath, $text, FILE_APPEND)) {
-            throw new \RuntimeException('Cannot add status information to "%s"', $this->statusFilePath);
+            throw new \RuntimeException(sprintf('Cannot add status information to "%s"', $this->statusFilePath));
         }
 
         return $this;
@@ -126,7 +126,7 @@ class Status
         if (!file_exists($this->statusFilePath)) {
             return $this;
         } else if (false === file_put_contents($this->statusFilePath, '')) {
-            throw new \RuntimeException('Cannot clear status information from "%s"', $this->statusFilePath);
+            throw new \RuntimeException(sprintf('Cannot clear status information from "%s"', $this->statusFilePath));
         }
         return $this;
     }
