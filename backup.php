@@ -8,4 +8,4 @@ ini_set('max_execution_time', 5000);
 $backupInfo = new \Magento\Update\Backup\BackupInfo();
 $backup = new \Magento\Update\Backup($backupInfo);
 
-$backup->run();
+echo $backup->run();

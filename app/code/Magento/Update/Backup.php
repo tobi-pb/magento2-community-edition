@@ -16,7 +16,11 @@ class Backup
         \Magento\Update\Backup\ArchivatorInterface $archivator = null
     ) {
         if (null === $archivator) {
-            $archivator = new \Magento\Update\Backup\PhpArchivator($backupInfo);
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                $archivator = new \Magento\Update\Backup\PhpArchivator($backupInfo);
+            } else {
+                $archivator = new \Magento\Update\Backup\UnixZipArchivator($backupInfo);
+            }
         }
         $this->archivator = $archivator;
     }

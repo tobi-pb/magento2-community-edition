@@ -12,7 +12,7 @@ class UnixZipArchivator implements ArchivatorInterface
     protected $backupInfo;
 
     /**
-     * Init  archivator
+     * Init archivator
      *
      * @param BackupInfo $backupInfo
      */
@@ -28,8 +28,28 @@ class UnixZipArchivator implements ArchivatorInterface
      */
     public function archive()
     {
-        //@todo implement functionality using shell command "zip"
-        return 'backup-file-name.zip';
-    }
+        $backupFileName = $this->backupInfo->getBackupFilename();
+        $backupFilePath = $this->backupInfo->getBackupPath() . DIRECTORY_SEPARATOR . $backupFileName;
 
+        $archivedDirectory = $this->backupInfo->getArchivedDirectory() . '/*';
+
+        $excludedElements = '';
+        foreach ($this->backupInfo->getBlacklist() as $excludedElement) {
+            $elementPath = $this->backupInfo->getArchivedDirectory() . $excludedElement;
+            $excludedElements .= is_dir($elementPath) ? "{$elementPath}\* " : "{$elementPath} ";
+        }
+
+        $shellArguments = sprintf(
+            "-r %s %s -x %s",
+            escapeshellarg($backupFilePath),
+            escapeshellarg($archivedDirectory),
+            escapeshellarg($excludedElements)
+        );
+
+        $lastLineOfCommand = exec('zip ' . $shellArguments, $output, $return);
+        if ($return) {
+            throw new \Exception(sprintf('Could not backup directory %s: $s', $archivedDirectory, $lastLineOfCommand));
+        }
+        return $backupFileName;
+    }
 }
