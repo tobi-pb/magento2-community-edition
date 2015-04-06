@@ -22,17 +22,26 @@ class StatusTest extends \PHPUnit_Framework_TestCase
      */
     protected $tmpStatusFilePath;
 
+    /**
+     * @var string
+     */
+    protected $tmpStatusLogFilePath;
+
     protected function setUp()
     {
         parent::setUp();
         $this->statusFilePath = __DIR__ . '/_files/update_status.txt';
         $this->tmpStatusFilePath = TESTS_TEMP_DIR . '/update_status.txt';
+        $this->tmpStatusLogFilePath = TESTS_TEMP_DIR . '/update_status.log';
 
-        /** Prepare temporary status file which can be modified */
         $statusFileContent = file_get_contents($this->statusFilePath);
+        /** Prepare temporary status file which can be modified */
         file_put_contents($this->tmpStatusFilePath, $statusFileContent);
         /** Make sure it was created */
         $this->assertEquals($statusFileContent, file_get_contents($this->tmpStatusFilePath), "Precondition failed.");
+
+        file_put_contents($this->tmpStatusLogFilePath, $statusFileContent);
+        $this->assertEquals($statusFileContent, file_get_contents($this->tmpStatusLogFilePath), "Precondition failed.");
     }
 
     protected function tearDown()
@@ -40,6 +49,9 @@ class StatusTest extends \PHPUnit_Framework_TestCase
         parent::tearDown();
         if (file_exists($this->tmpStatusFilePath)) {
             unlink($this->tmpStatusFilePath);
+        }
+        if (file_exists($this->tmpStatusLogFilePath)) {
+            unlink($this->tmpStatusLogFilePath);
         }
     }
 
@@ -130,7 +142,7 @@ class StatusTest extends \PHPUnit_Framework_TestCase
     public function testAdd()
     {
         $originalStatus = file_get_contents($this->tmpStatusFilePath);
-        $status = new \Magento\Update\Status($this->tmpStatusFilePath);
+        $status = new \Magento\Update\Status($this->tmpStatusFilePath, $this->tmpStatusLogFilePath);
 
         $firstUpdate = <<<FIRST_UPDATE
 Praesent blandit dolor.
@@ -150,6 +162,10 @@ SECOND_UPDATE;
             "{$originalStatus}\n{$firstUpdate}\n{$secondUpdate}",
             file_get_contents($this->tmpStatusFilePath)
         );
+        $this->assertEquals(
+            "{$originalStatus}\n{$firstUpdate}\n{$secondUpdate}",
+            file_get_contents($this->tmpStatusLogFilePath)
+        );
     }
 
     public function testAddToNotExistingFile()
@@ -168,9 +184,11 @@ STATUS_UPDATE;
 
     public function testClear()
     {
-        $status = new \Magento\Update\Status($this->tmpStatusFilePath);
+        $originalLogFileContent = file_get_contents($this->tmpStatusLogFilePath);
+        $status = new \Magento\Update\Status($this->tmpStatusFilePath, $this->tmpStatusLogFilePath);
         $this->assertInstanceOf('Magento\Update\Status', $status->clear());
         $this->assertEquals('', file_get_contents($this->tmpStatusFilePath));
+        $this->assertEquals($originalLogFileContent, file_get_contents($this->tmpStatusLogFilePath));
     }
 
     public function testClearNotExistingFile()

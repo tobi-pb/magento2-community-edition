@@ -15,18 +15,31 @@ namespace Magento\Update;
 class Status
 {
     /**
+     * Path to a file, which content is displayed on the updater web page.
+     *
      * @var string
      */
     protected $statusFilePath;
 
     /**
+     * Path to a log file, which contains a all the information displayed on the web page.
+     *
+     * Note that it can be cleared only manually, it is not cleared by clear() method.
+     *
+     * @var string
+     */
+    protected $logFilePath;
+
+    /**
      * Initialize.
      *
      * @param string|null $statusFilePath
+     * @param string|null $logFilePath
      */
-    public function __construct($statusFilePath = null)
+    public function __construct($statusFilePath = null, $logFilePath = null)
     {
         $this->statusFilePath = $statusFilePath ? $statusFilePath : UPDATER_BP . '/var/.update_status.txt';
+        $this->logFilePath = $logFilePath ? $logFilePath : UPDATER_BP . '/var/update_status.log';
     }
 
     /**
@@ -76,23 +89,34 @@ class Status
     /**
      * Add status update.
      *
+     * Add information to a temporary file which is used for status display on a web page and to a permanent status log.
+     *
      * @param string $text
      * @return $this
      * @throws \RuntimeException
      */
     public function add($text)
     {
+        /** Add status to permanent log file for future analysis and reference. */
+        if (false === file_put_contents($this->logFilePath, "\n{$text}", FILE_APPEND)) {
+            throw new \RuntimeException('Cannot write status information to "%s"', $this->statusFilePath);
+        }
+
+        /** Add status for display on the web page. */
         if (file_exists($this->statusFilePath) && file_get_contents($this->statusFilePath)) {
             $text = "\n{$text}";
         }
         if (false === file_put_contents($this->statusFilePath, $text, FILE_APPEND)) {
             throw new \RuntimeException('Cannot add status information to "%s"', $this->statusFilePath);
         }
+
         return $this;
     }
 
     /**
      * Clear current status.
+     *
+     * Note that this method does not clear status information from the permanent status log.
      *
      * @return $this
      * @throws \RuntimeException
