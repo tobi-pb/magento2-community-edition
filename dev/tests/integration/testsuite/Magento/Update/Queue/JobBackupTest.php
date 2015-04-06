@@ -21,6 +21,7 @@ class JobBackupTest extends \PHPUnit_Framework_TestCase
 
     public function testArchive()
     {
+        $this->markTestSkipped('MAGETWO-35283');
         $jobName = 'Backup';
         $jobStatus = new \Magento\Update\Status();
         $jobStatus->clear();
