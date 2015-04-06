@@ -12,24 +12,26 @@ if (file_exists($updateInProgressFlagFilename)) {
     exit('Cron is already in progress...');
 }
 
+$jobQueue = new \Magento\Update\Queue();
+$jobStatus = new \Magento\Update\Status();
+
 $updateInProgressFlagFile = fopen($updateInProgressFlagFilename, 'w');
 if (!$updateInProgressFlagFile) {
-    exit('Cron could not open ' . $updateInProgressFlagFilename);
+    $jobStatus->add(sprintf('"%s" cannot be created.', $updateInProgressFlagFilename));
+    exit();
 }
-
-/** @var \Magento\Update\Queue $jobQueue */
-$jobQueue = new \Magento\Update\Queue();
-
-/** @var \Magento\Update\Status $jobStatus */
-$jobStatus = new \Magento\Update\Status();
 
 /** @var \Magento\Update\Queue\AbstractJob $job*/
 foreach ($jobQueue->popQueuedJobs() as $job) {
+    $jobStatus->add(
+        sprintf('Job "%s" has been started with params: %s', $job->getName(), json_encode($job->getParams()))
+    );
     try {
         $job->execute();
-    } catch (Exception $e) {
-        $jobStatus->add(sprintf('An error occurred while executing job %s: %s', $job->getName(), $e->getMessage()));
+    } catch (\Exception $e) {
+        $jobStatus->add(sprintf('An error occurred while executing job "%s": %s', $job->getName(), $e->getMessage()));
     }
+    $jobStatus->add(sprintf('Job "%s" has been successfully completed', $job->getName()));
 }
 fclose($updateInProgressFlagFile);
 if (file_exists($updateInProgressFlagFilename)) {

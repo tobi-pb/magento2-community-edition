@@ -53,6 +53,16 @@ abstract class AbstractJob
     }
 
     /**
+     * Get job params.
+     *
+     * @return object
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
      * Execute job.
      *
      * @return $this
