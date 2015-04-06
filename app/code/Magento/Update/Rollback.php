@@ -8,13 +8,14 @@ namespace Magento\Update;
 
 class Rollback
 {
-    const BACKUP_DIR = '../../../../var/backup/';
-    const FILE_DIR = "../../../../..";
     const EXIT_COMMAND = 'quit';
     const INPUT_PATTERN = '/^([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2})$/';
 
     /**
      * Manual rollback to a archive version specified by user
+     *
+     * @throws \Exception
+     * @return bool
      */
     public function manualRollback()
     {
@@ -30,9 +31,14 @@ class Rollback
                 break;
             }
         }
-        $backupFilePath = self::BACKUP_DIR . 'backup-' . $backupVersion . 'zip';
+        $backupFilePath = $this->getBackupDir() . 'backup-' . $backupVersion . 'zip';
+        if (!file_exists($backupFilePath)) {
+            throw new \Exception ("The backup file does not exist.");
+        }
         echo "Restoring archive from $backupFilePath ...";
         $this->rollbackHelper($backupFilePath);
+
+        return true;
     }
 
     /**
@@ -43,7 +49,7 @@ class Rollback
     public function autoRollback()
     {
         $backupFileName = $this->getLastBackupFile();
-        $backupFilePath = self::BACKUP_DIR . $backupFileName;
+        $backupFilePath = $this->getBackupDir() . $backupFileName;
         $this->rollbackHelper($backupFilePath);
 
         return true;
@@ -57,7 +63,7 @@ class Rollback
      */
     protected function getLastBackupFile()
     {
-        $allFileList = scandir(self::BACKUP_DIR);
+        $allFileList = scandir($this->getBackupDir());
         $backupFileList = [];
 
         foreach ($allFileList as $fileName) {
@@ -81,6 +87,16 @@ class Rollback
      */
     protected function rollbackHelper($backupFilePath)
     {
-        echo shell_exec('unzip ' . $backupFilePath . ' -d ' . self::FILE_DIR);
+        echo shell_exec('unzip ' . $backupFilePath . ' -d ' . MAGENTO_BP);
+    }
+
+    /**
+     * Return the dir to backup
+     *
+     * @return string
+     */
+    protected function getBackupDir()
+    {
+        return UPDATER_BP . '/var/backup';
     }
 }
