@@ -44,8 +44,8 @@ class Status
     public function get($maxNumberOfLines = null, $lineLengthLimit = 120)
     {
         $status = '';
-        $fullStatusArray = file($this->statusFilePath);
-        if ($fullStatusArray) {
+        if (file_exists($this->statusFilePath)) {
+            $fullStatusArray = file($this->statusFilePath);
             $linesInFile = count($fullStatusArray);
             if (!$maxNumberOfLines || ($maxNumberOfLines > $linesInFile)) {
                 $maxNumberOfLines = $linesInFile;
@@ -78,9 +78,16 @@ class Status
      *
      * @param string $text
      * @return $this
+     * @throws \RuntimeException
      */
     public function add($text)
     {
+        if (file_exists($this->statusFilePath) && file_get_contents($this->statusFilePath)) {
+            $text = "\n{$text}";
+        }
+        if (false === file_put_contents($this->statusFilePath, $text, FILE_APPEND)) {
+            throw new \RuntimeException('Cannot add status information to "%s"', $this->statusFilePath);
+        }
         return $this;
     }
 
@@ -88,9 +95,15 @@ class Status
      * Clear current status.
      *
      * @return $this
+     * @throws \RuntimeException
      */
     public function clear()
     {
+        if (!file_exists($this->statusFilePath)) {
+            return $this;
+        } else if (false === file_put_contents($this->statusFilePath, '')) {
+            throw new \RuntimeException('Cannot clear status information from "%s"', $this->statusFilePath);
+        }
         return $this;
     }
 }

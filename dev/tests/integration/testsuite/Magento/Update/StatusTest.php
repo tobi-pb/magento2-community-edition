@@ -113,4 +113,73 @@ class StatusTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    public function testGetFileDoesNotExixt()
+    {
+        $status = new \Magento\Update\Status('invalid_file_path');
+        $this->assertEquals('', $status->get());
+    }
+
+    public function testGetEmptyFile()
+    {
+        file_put_contents($this->tmpStatusFilePath, '');
+        $status = new \Magento\Update\Status($this->tmpStatusFilePath);
+        $this->assertEquals('', $status->get());
+    }
+
+    public function testAdd()
+    {
+        $originalStatus = file_get_contents($this->tmpStatusFilePath);
+        $status = new \Magento\Update\Status($this->tmpStatusFilePath);
+
+        $firstUpdate = <<<FIRST_UPDATE
+Praesent blandit dolor.
+Sed non quam.
+FIRST_UPDATE;
+        $status->add($firstUpdate);
+        $this->assertEquals("$originalStatus\n{$firstUpdate}", file_get_contents($this->tmpStatusFilePath));
+
+        $secondUpdate = <<<SECOND_UPDATE
+Donec lacus nunc, viverra nec, blandit vel, egestas et, augue.
+
+Vestibulum tincidunt malesuada tellus. Ut ultrices ultrices enim.
+Curabitur sit amet mauris. Morbi in dui quis est pulvinar ullamcorper.
+SECOND_UPDATE;
+        $this->assertInstanceOf('Magento\Update\Status', $status->add($secondUpdate));
+        $this->assertEquals(
+            "{$originalStatus}\n{$firstUpdate}\n{$secondUpdate}",
+            file_get_contents($this->tmpStatusFilePath)
+        );
+    }
+
+    public function testAddToNotExistingFile()
+    {
+        unlink($this->tmpStatusFilePath);
+        $this->assertFalse(file_exists($this->tmpStatusFilePath), "Precondition failed.");
+
+        $status = new \Magento\Update\Status($this->tmpStatusFilePath);
+        $statusUpdate = <<<STATUS_UPDATE
+Praesent blandit dolor.
+Sed non quam.
+STATUS_UPDATE;
+        $status->add($statusUpdate);
+        $this->assertEquals("{$statusUpdate}", file_get_contents($this->tmpStatusFilePath));
+    }
+
+    public function testClear()
+    {
+        $status = new \Magento\Update\Status($this->tmpStatusFilePath);
+        $this->assertInstanceOf('Magento\Update\Status', $status->clear());
+        $this->assertEquals('', file_get_contents($this->tmpStatusFilePath));
+    }
+
+    public function testClearNotExistingFile()
+    {
+        unlink($this->tmpStatusFilePath);
+        $this->assertFalse(file_exists($this->tmpStatusFilePath), "Precondition failed.");
+
+        $status = new \Magento\Update\Status($this->tmpStatusFilePath);
+        $this->assertInstanceOf('Magento\Update\Status', $status->clear());
+        $this->assertFalse(file_exists($this->tmpStatusFilePath));
+    }
 }

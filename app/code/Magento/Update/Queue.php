@@ -48,7 +48,7 @@ class Queue
     /**
      * Pop all updater application queued jobs.
      * 
-     * Note, that this method is idempotent, queue will be cleared after its execution
+     * Note, that this method is not idempotent, queue will be cleared after its execution
      *
      * @return AbstractJob[]
      * @throws \RuntimeException
