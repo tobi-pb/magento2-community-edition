@@ -31,6 +31,9 @@ class PhpArchivatorTest extends \PHPUnit_Framework_TestCase
 
     public function testArchive()
     {
+        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+            $this->markTestSkipped();
+        }
         $backupInfo = $this->getMockBuilder('Magento\Update\Backup\BackupInfo')
             ->disableOriginalConstructor()
             ->setMethods(['getBackupFilename','getBlacklist', 'getArchivedDirectory'])
