@@ -57,7 +57,7 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         }
         $this->jobRemoveBackup = new \Magento\Update\Queue\JobRemoveBackups(
             'remove_backups',
-            [$this->backupPath . $this->backupFilenameA]
+            [$this->backupFilenameA]
         );
         $this->jobRemoveBackup->execute();
     }
@@ -77,7 +77,7 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
     {
         $this->jobRemoveBackup = new \Magento\Update\Queue\JobRemoveBackups(
             'remove_backups',
-            ['backups_file_names' => [$this->backupPath . 'no-such-file.zip']]
+            ['backups_file_names' => ['no-such-file.zip']]
         );
         $this->jobRemoveBackup->execute();
     }
@@ -89,7 +89,7 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         }
         $this->jobRemoveBackup = new \Magento\Update\Queue\JobRemoveBackups(
             'remove_backups',
-            ['backups_file_names' => [$this->backupPath . $this->backupFilenameA]]
+            ['backups_file_names' => [$this->backupFilenameA]]
         );
         $this->jobRemoveBackup->execute();
         $this->assertFalse(file_exists($this->backupPath . $this->backupFilenameA));
@@ -110,8 +110,8 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
             'remove_backups',
             [
                 'backups_file_names' => [
-                    $this->backupPath . $this->backupFilenameA,
-                    $this->backupPath . $this->backupFilenameB
+                    $this->backupFilenameA,
+                    $this->backupFilenameB
                 ]
             ]
         );
