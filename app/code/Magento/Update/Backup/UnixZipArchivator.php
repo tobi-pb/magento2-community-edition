@@ -38,19 +38,13 @@ class UnixZipArchivator implements ArchivatorInterface
             $elementPath = $this->backupInfo->getArchivedDirectory() . $excludedElement;
             $excludedElements .= is_dir($elementPath) ? "{$elementPath}\* " : "{$elementPath} ";
         }
-
-        $shellArguments = sprintf(
-            "-r %s %s -x %s",
-            escapeshellarg($backupFilePath),
-            escapeshellarg($archivedDirectory),
-            escapeshellarg($excludedElements)
+        $command = escapeshellcmd(
+            sprintf("zip -r %s %s -x %s", $backupFilePath, $archivedDirectory, $excludedElements)
         );
-
-        $command = 'zip ' . $shellArguments;
-        $lastLineOfCommand = exec($command, $output, $return);
+        $lastLineOfOutput = exec($command, $output, $return);
         if ($return) {
             throw new \Exception(
-                sprintf('Could not backup with script %s : %s', $command, $lastLineOfCommand)
+                sprintf('Could not backup with script %s : %s', $command, $lastLineOfOutput)
             );
         }
         return $backupFileName;
