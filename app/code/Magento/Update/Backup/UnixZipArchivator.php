@@ -46,9 +46,12 @@ class UnixZipArchivator implements ArchivatorInterface
             escapeshellarg($excludedElements)
         );
 
-        $lastLineOfCommand = exec('zip ' . $shellArguments, $output, $return);
+        $command = 'zip ' . $shellArguments;
+        $lastLineOfCommand = exec($command, $output, $return);
         if ($return) {
-            throw new \Exception(sprintf('Could not backup directory %s: $s', $archivedDirectory, $lastLineOfCommand));
+            throw new \Exception(
+                sprintf('Could not backup with script %s : %s', $command, $lastLineOfCommand)
+            );
         }
         return $backupFileName;
     }
