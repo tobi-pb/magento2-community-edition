@@ -24,7 +24,7 @@ class JobBackup extends AbstractJob
     {
         $backupInfo = new BackupInfo();
         $archivator = $this->createArchivator($backupInfo);
-        $this->jobStatus->add(sprintf('Backup %s has been created', $archivator->archive()));
+        $this->jobStatus->add(sprintf('%s: Backup %s has been created', $this->getName(), $archivator->archive()));
         return $this;
     }
 
