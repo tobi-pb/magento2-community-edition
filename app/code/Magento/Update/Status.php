@@ -31,15 +31,26 @@ class Status
     protected $logFilePath;
 
     /**
+     * Path to a flag, which exists when updater app is running.
+     *
+     * @var string
+     */
+    protected $updateInProgressFlagFilePath;
+
+    /**
      * Initialize.
      *
      * @param string|null $statusFilePath
      * @param string|null $logFilePath
+     * @param string|null $updateInProgressFlagFilePath
      */
-    public function __construct($statusFilePath = null, $logFilePath = null)
+    public function __construct($statusFilePath = null, $logFilePath = null, $updateInProgressFlagFilePath = null)
     {
         $this->statusFilePath = $statusFilePath ? $statusFilePath : UPDATER_BP . '/var/.update_status.txt';
         $this->logFilePath = $logFilePath ? $logFilePath : UPDATER_BP . '/var/update_status.log';
+        $this->updateInProgressFlagFilePath = $updateInProgressFlagFilePath
+            ? $updateInProgressFlagFilePath
+            : UPDATER_BP . '/var/.update_in_progress.flag';
     }
 
     /**
@@ -99,8 +110,8 @@ class Status
     {
         $currentUtcTime = '[' . date('Y-m-d H:i:s T', time()) . '] ';
         $text = $currentUtcTime . $text;
-        $this->writeToFile($text, $this->logFilePath);
-        $this->writeToFile($text, $this->statusFilePath);
+        $this->writeMessageToFile($text, $this->logFilePath);
+        $this->writeMessageToFile($text, $this->statusFilePath);
         return $this;
     }
 
@@ -112,7 +123,7 @@ class Status
      * @return $this
      * @throws \RuntimeException
      */
-    protected function writeToFile($text, $filePath)
+    protected function writeMessageToFile($text, $filePath)
     {
         $isNewFile = !file_exists($filePath);
         if (!$isNewFile && file_get_contents($filePath)) {
@@ -128,7 +139,7 @@ class Status
     }
 
     /**
-     * Clear current status.
+     * Clear current status text.
      *
      * Note that this method does not clear status information from the permanent status log.
      *
@@ -141,6 +152,36 @@ class Status
             return $this;
         } else if (false === file_put_contents($this->statusFilePath, '')) {
             throw new \RuntimeException(sprintf('Cannot clear status information from "%s"', $this->statusFilePath));
+        }
+        return $this;
+    }
+
+    /**
+     * Check if updater application is running.
+     *
+     * @return bool
+     */
+    public function isUpdateInProgress()
+    {
+        return file_exists($this->updateInProgressFlagFilePath);
+    }
+
+    /**
+     * Set current updater app status: true if update is in progress, false otherwise.
+     *
+     * @param bool $isInProgress
+     * @return $this
+     */
+    public function setUpdateInProgress($isInProgress = true)
+    {
+        if ($isInProgress) {
+            $updateInProgressFlagFile = fopen($this->updateInProgressFlagFilePath, 'w');
+            if (!$updateInProgressFlagFile) {
+                throw new \RuntimeException(sprintf('"%s" cannot be created.', $this->updateInProgressFlagFilePath));
+            }
+            fclose($updateInProgressFlagFile);
+        } else if (file_exists($this->updateInProgressFlagFilePath)) {
+            unlink($this->updateInProgressFlagFilePath);
         }
         return $this;
     }

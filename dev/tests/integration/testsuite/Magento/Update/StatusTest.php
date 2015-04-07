@@ -27,12 +27,18 @@ class StatusTest extends \PHPUnit_Framework_TestCase
      */
     protected $tmpStatusLogFilePath;
 
+    /**
+     * @var string
+     */
+    protected $updateInProgressFlagFilePath;
+
     protected function setUp()
     {
         parent::setUp();
         $this->statusFilePath = __DIR__ . '/_files/update_status.txt';
         $this->tmpStatusFilePath = TESTS_TEMP_DIR . '/update_status.txt';
         $this->tmpStatusLogFilePath = TESTS_TEMP_DIR . '/update_status.log';
+        $this->updateInProgressFlagFilePath = TESTS_TEMP_DIR . '/update_in_rogress.flag';
 
         $statusFileContent = file_get_contents($this->statusFilePath);
         /** Prepare temporary status file which can be modified */
@@ -52,6 +58,9 @@ class StatusTest extends \PHPUnit_Framework_TestCase
         }
         if (file_exists($this->tmpStatusLogFilePath)) {
             unlink($this->tmpStatusLogFilePath);
+        }
+        if (file_exists($this->updateInProgressFlagFilePath)) {
+            unlink($this->updateInProgressFlagFilePath);
         }
     }
 
@@ -196,6 +205,25 @@ STATUS_UPDATE;
         $status = new \Magento\Update\Status($this->tmpStatusFilePath);
         $this->assertInstanceOf('Magento\Update\Status', $status->clear());
         $this->assertFalse(file_exists($this->tmpStatusFilePath));
+    }
+
+    public function testIsUpdateInProgress()
+    {
+        $status = new \Magento\Update\Status(
+            $this->tmpStatusFilePath,
+            $this->tmpStatusLogFilePath,
+            $this->updateInProgressFlagFilePath
+        );
+        $this->assertFalse($status->isUpdateInProgress());
+
+        $this->assertInstanceOf('Magento\Update\Status', $status->setUpdateInProgress());
+        $this->assertTrue($status->isUpdateInProgress());
+
+        $this->assertInstanceOf('Magento\Update\Status', $status->setUpdateInProgress(false));
+        $this->assertFalse($status->isUpdateInProgress());
+
+        $this->assertInstanceOf('Magento\Update\Status', $status->setUpdateInProgress(true));
+        $this->assertTrue($status->isUpdateInProgress());
     }
 
     /**

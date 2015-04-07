@@ -3,7 +3,8 @@
  * Copyright © 2015 Magento. All rights reserved.
  * See COPYING.txt for license details.
  */
-/** @var \Magento\Update\Status $status */
+/** @var string $statusMessage */
+/** @var bool $isUpdateInProgress */
 ?>
 <!doctype html>
 <html>
@@ -19,6 +20,13 @@
 </head>
 <body>
 <h3>Magento update status:</h3>
-<div id="status-message"><?php include __DIR__ . "/status/message.phtml" ?></div>
+
+<h3>
+    <div id="status">
+        <?php echo $isUpdateInProgress ? "Update application is running" : "Update application is NOT running" ?>
+    </div>
+</h3>
+
+<div id="status-message"><?php echo $statusMessage ?></div>
 </body>
 </html>
