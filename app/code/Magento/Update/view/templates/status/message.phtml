@@ -1,0 +1,17 @@
+<?php
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+/** @var \Magento\Update\Status $status */
+?>
+<?php
+/** TODO: Message is added here for demo purposes */
+$status->add("Message #" . rand(1, 1000));
+
+$statusMessage = $status->get(10);
+if (!$statusMessage) {
+    $statusMessage = 'Please wait for job processing to start.';
+}
+$statusMessage = str_replace("\n", "<br />", $statusMessage);
+echo $statusMessage;

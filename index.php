@@ -6,19 +6,10 @@
 
 require_once __DIR__ . '/app/bootstrap.php';
 
-$headerText = 'Last Update';
-$messageText = file_get_contents('var/.update_status.txt');
-if (!$messageText) {
-    $headerText = 'Error';
-    $messageText = 'There was an error opening the file';
+$status = new \Magento\Update\Status();
+if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+    /* Ajax request processing */
+    include __DIR__ . '/app/code/Magento/Update/view/templates/status/message.phtml';
+} else {
+    include __DIR__ . '/app/code/Magento/Update/view/templates/status.phtml';
 }
-
-echo <<<HTML
-<link rel="stylesheet" href="pub/style.css">
-    <div style="margin:0 0 25px 0; border-bottom:1px solid #ccc;">
-        <h3>
-        {$headerText}</h3>
-    </div>
-    <p>{$messageText}</p>
-HTML;
-
