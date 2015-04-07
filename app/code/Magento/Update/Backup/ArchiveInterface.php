@@ -6,7 +6,7 @@
 
 namespace Magento\Update\Backup;
 
-interface ArchivatorInterface
+interface ArchiveInterface
 {
     /**
      * @return string Backup filename

@@ -6,7 +6,7 @@
 
 namespace Magento\Update\Backup;
 
-class PhpArchivator implements ArchivatorInterface
+class PhpZipArchive implements ArchiveInterface
 {
     /** @var  \Magento\Update\Backup\BackupInfo */
     protected $backupInfo;

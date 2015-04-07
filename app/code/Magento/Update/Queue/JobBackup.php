@@ -7,8 +7,8 @@
 namespace Magento\Update\Queue;
 
 use Magento\Update\Backup\BackupInfo;
-use Magento\Update\Backup\PhpArchivator;
-use Magento\Update\Backup\UnixZipArchivator;
+use Magento\Update\Backup\PhpZipArchive;
+use Magento\Update\Backup\UnixZipArchive;
 
 /**
  * Magento updater application 'backup' job.
@@ -32,14 +32,14 @@ class JobBackup extends AbstractJob
      * Return concrete archivator
      *
      * @param \Magento\Update\Backup\BackupInfo $backupInfo
-     * @return \Magento\Update\Backup\ArchivatorInterface
+     * @return \Magento\Update\Backup\ArchiveInterface
      */
     protected function createArchivator($backupInfo)
     {
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            return new PhpArchivator($backupInfo);
+            return new PhpZipArchive($backupInfo);
         } else {
-            return new UnixZipArchivator($backupInfo);
+            return new UnixZipArchive($backupInfo);
         }
     }
 }

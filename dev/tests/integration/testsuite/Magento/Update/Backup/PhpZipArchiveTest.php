@@ -5,7 +5,7 @@
  */
 namespace Magento\Update\Backup;
 
-class PhpArchivatorTest extends \PHPUnit_Framework_TestCase
+class PhpArchiveTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  string */
     protected $backupFilename;
@@ -19,7 +19,6 @@ class PhpArchivatorTest extends \PHPUnit_Framework_TestCase
         $this->backupFilename = uniqid('test_backup') . '.zip';
         $this->backupPath = UPDATER_BP . '/var/backup/';
     }
-
 
     protected function tearDown()
     {
@@ -48,7 +47,7 @@ class PhpArchivatorTest extends \PHPUnit_Framework_TestCase
             ->method('getBlacklist')
             ->willReturn(['/var/backup', '/vendor', '/app/code']);
 
-        $archivator = new \Magento\Update\Backup\PhpArchivator($backupInfo);
+        $archivator = new \Magento\Update\Backup\PhpZipArchive($backupInfo);
         $result = $archivator->archive();
         $this->assertEquals($this->backupFilename, $result);
         $fileContent = file_get_contents($this->backupPath . $this->backupFilename);

@@ -6,7 +6,7 @@
 
 namespace Magento\Update\Backup;
 
-class UnixZipArchivator implements ArchivatorInterface
+class UnixZipArchive implements ArchiveInterface
 {
     /** @var  \Magento\Update\Backup\BackupInfo */
     protected $backupInfo;
@@ -30,17 +30,14 @@ class UnixZipArchivator implements ArchivatorInterface
     {
         $backupFileName = $this->backupInfo->getBackupFilename();
         $backupFilePath = $this->backupInfo->getBackupPath() . DIRECTORY_SEPARATOR . $backupFileName;
-
-        $archivedDirectory = $this->backupInfo->getArchivedDirectory() . '/\*';
-
+        $archivedDirectory = $this->backupInfo->getArchivedDirectory() . '/*';
         $excludedElements = '';
+
         foreach ($this->backupInfo->getBlacklist() as $excludedElement) {
             $elementPath = $this->backupInfo->getArchivedDirectory() . $excludedElement;
-            $excludedElements .= is_dir($elementPath) ? "{$elementPath}\\* " : "{$elementPath} ";
+            $excludedElements .= is_dir($elementPath) ? $elementPath . '\* '  : $elementPath . ' ';
         }
-        $command = escapeshellcmd(
-            sprintf("zip -r %s %s -x %s", $backupFilePath, $archivedDirectory, $excludedElements)
-        );
+        $command = sprintf("zip -r %s %s -x %s", $backupFilePath, $archivedDirectory, $excludedElements);
         $lastLineOfOutput = exec($command, $output, $return);
         if ($return) {
             throw new \Exception(
