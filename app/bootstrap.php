@@ -9,4 +9,6 @@ error_reporting(E_ALL);
 define('UPDATER_BP', realpath(__DIR__ . '/../'));
 define('MAGENTO_BP', realpath(__DIR__ . '/../../'));
 
+date_default_timezone_set('UTC');
+
 require_once UPDATER_BP . '/vendor/autoload.php';

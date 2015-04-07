@@ -149,7 +149,9 @@ Praesent blandit dolor.
 Sed non quam.
 FIRST_UPDATE;
         $status->add($firstUpdate);
-        $this->assertEquals("$originalStatus\n{$firstUpdate}", file_get_contents($this->tmpStatusFilePath));
+        $textAfterFirstUpdate = "$originalStatus\n{$firstUpdate}";
+        $this->verifyAddedStatus($textAfterFirstUpdate, $this->tmpStatusFilePath, 1);
+        $this->verifyAddedStatus($textAfterFirstUpdate, $this->tmpStatusLogFilePath, 1);
 
         $secondUpdate = <<<SECOND_UPDATE
 Donec lacus nunc, viverra nec, blandit vel, egestas et, augue.
@@ -158,14 +160,9 @@ Vestibulum tincidunt malesuada tellus. Ut ultrices ultrices enim.
 Curabitur sit amet mauris. Morbi in dui quis est pulvinar ullamcorper.
 SECOND_UPDATE;
         $this->assertInstanceOf('Magento\Update\Status', $status->add($secondUpdate));
-        $this->assertEquals(
-            "{$originalStatus}\n{$firstUpdate}\n{$secondUpdate}",
-            file_get_contents($this->tmpStatusFilePath)
-        );
-        $this->assertEquals(
-            "{$originalStatus}\n{$firstUpdate}\n{$secondUpdate}",
-            file_get_contents($this->tmpStatusLogFilePath)
-        );
+        $textAfterSecondUpdate = "{$originalStatus}\n{$firstUpdate}\n{$secondUpdate}";
+        $this->verifyAddedStatus($textAfterSecondUpdate, $this->tmpStatusFilePath, 2);
+        $this->verifyAddedStatus($textAfterSecondUpdate, $this->tmpStatusLogFilePath, 2);
     }
 
     public function testAddToNotExistingFile()
@@ -178,8 +175,8 @@ SECOND_UPDATE;
 Praesent blandit dolor.
 Sed non quam.
 STATUS_UPDATE;
-        $status->add($statusUpdate);
-        $this->assertEquals("{$statusUpdate}", file_get_contents($this->tmpStatusFilePath));
+        $status->add($statusUpdate, $this->tmpStatusFilePath);
+        $this->verifyAddedStatus($statusUpdate, $this->tmpStatusFilePath, 1);
     }
 
     public function testClear()
@@ -199,5 +196,23 @@ STATUS_UPDATE;
         $status = new \Magento\Update\Status($this->tmpStatusFilePath);
         $this->assertInstanceOf('Magento\Update\Status', $status->clear());
         $this->assertFalse(file_exists($this->tmpStatusFilePath));
+    }
+
+    /**
+     * @param string $expectedTextAfterUpdate
+     * @param string $filePath
+     * @param int $expectedNumberOfTimeEntries
+     */
+    protected function verifyAddedStatus($expectedTextAfterUpdate, $filePath, $expectedNumberOfTimeEntries)
+    {
+        $actualStatusText = file_get_contents($filePath);
+        /** Make sure that number of current date/time entries matches expected value */
+        preg_match_all('/\[.*?\]\s/', $actualStatusText, $matches);
+        $this->assertCount(1, $matches);
+        $this->assertCount($expectedNumberOfTimeEntries, $matches[0]);
+
+        /** Eliminate current date/time entries from the actual status content before text comparison */
+        $actualStatusText = preg_replace('/\[.*?\]\s/', '', $actualStatusText);
+        $this->assertEquals($expectedTextAfterUpdate, $actualStatusText);
     }
 }

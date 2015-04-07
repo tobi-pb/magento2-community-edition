@@ -22,7 +22,7 @@ class Status
     protected $statusFilePath;
 
     /**
-     * Path to a log file, which contains a all the information displayed on the web page.
+     * Path to a log file, which contains all the information displayed on the web page.
      *
      * Note that it can be cleared only manually, it is not cleared by clear() method.
      *
@@ -97,19 +97,33 @@ class Status
      */
     public function add($text)
     {
-        /** Add status to permanent log file for future analysis and reference. */
-        if (false === file_put_contents($this->logFilePath, "\n{$text}", FILE_APPEND)) {
-            throw new \RuntimeException(sprintf('Cannot write status information to "%s"', $this->statusFilePath));
-        }
+        $currentUtcTime = '[' . date('Y-m-d H:i:s T', time()) . '] ';
+        $text = $currentUtcTime . $text;
+        $this->writeToFile($text, $this->logFilePath);
+        $this->writeToFile($text, $this->statusFilePath);
+        return $this;
+    }
 
-        /** Add status for display on the web page. */
-        if (file_exists($this->statusFilePath) && file_get_contents($this->statusFilePath)) {
+    /**
+     * Write status information to the file.
+     *
+     * @param string $text
+     * @param string $filePath
+     * @return $this
+     * @throws \RuntimeException
+     */
+    protected function writeToFile($text, $filePath)
+    {
+        $isNewFile = !file_exists($filePath);
+        if (!$isNewFile && file_get_contents($filePath)) {
             $text = "\n{$text}";
         }
-        if (false === file_put_contents($this->statusFilePath, $text, FILE_APPEND)) {
-            throw new \RuntimeException(sprintf('Cannot add status information to "%s"', $this->statusFilePath));
+        if (false === file_put_contents($filePath, $text, FILE_APPEND)) {
+            throw new \RuntimeException(sprintf('Cannot add status information to "%s"', $filePath));
         }
-
+        if ($isNewFile) {
+            chmod($filePath, 0777);
+        }
         return $this;
     }
 
