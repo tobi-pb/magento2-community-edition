@@ -7,6 +7,7 @@
 require_once __DIR__ . '/app/bootstrap.php';
 
 $updateInProgressFlagFilename = UPDATER_BP . '/var/.update_in_progress.flag';
+$backupDirectory = UPDATER_BP . '/var/backup';
 
 if (file_exists($updateInProgressFlagFilename)) {
     exit('Cron is already in progress...');
@@ -14,6 +15,11 @@ if (file_exists($updateInProgressFlagFilename)) {
 
 $jobQueue = new \Magento\Update\Queue();
 $jobStatus = new \Magento\Update\Status();
+
+if (!file_exists($backupDirectory) && !mkdir($backupDirectory)) {
+    $jobStatus->add(sprintf('Backup directory "%s" cannot be created.', $backupDirectory));
+    exit();
+}
 
 $updateInProgressFlagFile = fopen($updateInProgressFlagFilename, 'w');
 if (!$updateInProgressFlagFile) {
