@@ -6,34 +6,37 @@
 
 namespace Magento\Update;
 
+/**
+ * Class for rollback capabilities
+ */
 class Rollback
 {
-    const EXIT_COMMAND = 'quit';
-    const INPUT_PATTERN = '/^([0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2})$/';
+    /**
+     * @var string
+     */
+    protected $backupFileDir;
 
     /**
-     * Manual rollback to a archive version specified by user
+     * Initialize rollback.
      *
+     * @param string|null $backupFileDir
+     */
+    public function __construct($backupFileDir = null)
+    {
+        $this->backupFileDir = $backupFileDir ? $backupFileDir : UPDATER_BP . '/var/backup';
+    }
+
+    /**
+     * Rollback to an archive version using the backup file path specified by update_queue.json
+     *
+     * @param string $backupFilePath
      * @throws \Exception
      * @return bool
      */
-    public function manualRollback()
+    public function manualRollback($backupFilePath)
     {
-        $backupVersion = readline(
-            "Enter the backup version you wish to restore in this format [yyyy-mm-dd-hh-mm-ss] or enter [quit] to exit:"
-        );
-        while (true) {
-            if ($backupVersion == self::EXIT_COMMAND) {
-                exit;
-            } elseif (!preg_match(self::INPUT_PATTERN, $backupVersion)) {
-                $backupVersion = readline("The version you entered is in the wrong format! Please re-enter:");
-            } else {
-                break;
-            }
-        }
-        $backupFilePath = $this->getBackupDir() . 'backup-' . $backupVersion . 'zip';
         if (!file_exists($backupFilePath)) {
-            throw new \Exception ("The backup file does not exist.");
+            throw new \Exception ("The backup file specified by update_queue.json does not exist.");
         }
         echo "Restoring archive from $backupFilePath ...";
         $this->rollbackHelper($backupFilePath);
@@ -49,7 +52,7 @@ class Rollback
     public function autoRollback()
     {
         $backupFileName = $this->getLastBackupFile();
-        $backupFilePath = $this->getBackupDir() . $backupFileName;
+        $backupFilePath = $this->backupFileDir . $backupFileName;
         $this->rollbackHelper($backupFilePath);
 
         return true;
@@ -63,40 +66,37 @@ class Rollback
      */
     protected function getLastBackupFile()
     {
-        $allFileList = scandir($this->getBackupDir());
-        $backupFileList = [];
+        $allFileList = scandir($this->backupFileDir, SCANDIR_SORT_DESCENDING);
+        $backupFileName = '';
 
         foreach ($allFileList as $fileName) {
-            if (strpos($fileName, 'backup') !== null) {
-                $backupFileList[] = $fileName;
+            if (strpos($fileName, 'backup') !== false) {
+                $backupFileName = $fileName;
+                break;
             }
         }
 
-        if (empty($backupFileList)) {
+        if (empty($backupFileName)) {
             throw new \Exception ("No available backup file found.");
         }
-        sort($backupFileList);
-        return array_pop($backupFileList);
+        return $backupFileName;
     }
 
     /**
      * Rollback
      *
      * @param string $backupFilePath
+     * @throws \Exception
      * @return void
      */
     protected function rollbackHelper($backupFilePath)
     {
-        echo shell_exec('unzip ' . $backupFilePath . ' -d ' . MAGENTO_BP);
-    }
-
-    /**
-     * Return the dir to backup
-     *
-     * @return string
-     */
-    protected function getBackupDir()
-    {
-        return UPDATER_BP . '/var/backup';
+        exec('unzip ' . $backupFilePath . ' -d ' . MAGENTO_BP, $output, $return);
+        if ($return) {
+            throw new \Exception("Rollback was not successful.");
+        }
+        foreach ($output as $message) {
+            printf("$message\n");
+        }
     }
 }
