@@ -6,19 +6,26 @@
 
 namespace Magento\Update\Queue;
 
+use \Magento\Update\Rollback;
+
 /**
  * Magento updater application 'rollback' job.
  */
 class JobRollback extends AbstractJob
 {
-    // TODO: Add job specific getters and there initialization based on construct params in scope of https://jira.corp.x.com/browse/MAGETWO-35313
+    const BACKUP_FILE_NAME = 'backup_file_name';
 
     /**
      * {@inheritdoc}
      */
     public function execute()
     {
-        // TODO: Implement execute() method.
+        $backupFilePath = '';
+        if (isset($this->params[self::BACKUP_FILE_NAME])) {
+            $backupFilePath = $this->params[self::BACKUP_FILE_NAME];
+        }
+        $rollBack = new Rollback();
+        $rollBack->manualRollback($backupFilePath);
         return $this;
     }
 }
