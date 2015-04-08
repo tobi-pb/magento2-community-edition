@@ -27,13 +27,13 @@ try {
 $jobQueue = new \Magento\Update\Queue();
 foreach ($jobQueue->popQueuedJobs() as $job) {
     $status->add(
-        sprintf('Job "%s" has been started with params: %s', $job->getName(), json_encode($job->getParams()))
+        sprintf('Job "%s" has been started', $job)
     );
     try {
         $job->execute();
     } catch (\Exception $e) {
-        $status->add(sprintf('An error occurred while executing job "%s": %s', $job->getName(), $e->getMessage()));
+        $status->add(sprintf('An error occurred while executing job "%s": %s', $job, $e->getMessage()));
     }
-    $status->add(sprintf('Job "%s" has been successfully completed', $job->getName()));
+    $status->add(sprintf('Job "%s" has been successfully completed', $job));
 }
 $status->setUpdateInProgress(false);

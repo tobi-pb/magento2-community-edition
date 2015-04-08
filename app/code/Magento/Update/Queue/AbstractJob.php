@@ -53,13 +53,13 @@ abstract class AbstractJob
     }
 
     /**
-     * Get job params.
+     * Get string representation of a job.
      *
-     * @return object
+     * @return string
      */
-    public function getParams()
+    public function __toString()
     {
-        return $this->params;
+        return '<' . $this->name . '>' . json_encode($this->params);
     }
 
     /**
