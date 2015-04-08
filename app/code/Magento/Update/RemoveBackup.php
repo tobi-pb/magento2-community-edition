@@ -9,18 +9,31 @@ namespace Magento\Update;
 class RemoveBackup
 {
     const MAINTENANCE_FLAG_FILE = '/var/.maintenance.flag';
-    const UPDATE_ERROR_FLAG_FILE = '/var/.update_error.flag';
 
+    /**
+     * @var string
+     */
     protected $backupPath;
+
+    /**
+     * @var string[]
+     */
     protected $filesToDelete;
 
     /**
-     * @param string[] $filesToDelete
+     * @var \Magento\Update\Status
      */
-    public function __construct($filesToDelete)
+    protected $status;
+
+    /**
+     * @param string[] $filesToDelete
+     * @param \Magento\Update\Status|null $status
+     */
+    public function __construct($filesToDelete, $status = null)
     {
         $this->backupPath = UPDATER_BP . '/var/backup/';
         $this->filesToDelete = $filesToDelete;
+        $this->status = $status;
     }
 
     /**
@@ -29,9 +42,9 @@ class RemoveBackup
      */
     public function run()
     {
-        if (file_exists(UPDATER_BP . self::MAINTENANCE_FLAG_FILE) ||
-            file_exists(UPDATER_BP . self::UPDATE_ERROR_FLAG_FILE))
-        {
+        if (file_exists(UPDATER_BP . self::MAINTENANCE_FLAG_FILE)
+            || $this->status->isUpdateError()
+        ) {
             throw new \Exception("Cannot remove archives while setup is in progress");
             return;
         }

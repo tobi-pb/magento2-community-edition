@@ -32,13 +32,19 @@ class StatusTest extends \PHPUnit_Framework_TestCase
      */
     protected $updateInProgressFlagFilePath;
 
+    /**
+     * @var string
+     */
+    protected $updateErrorFlagFilePath;
+
     protected function setUp()
     {
         parent::setUp();
         $this->statusFilePath = __DIR__ . '/_files/update_status.txt';
         $this->tmpStatusFilePath = TESTS_TEMP_DIR . '/update_status.txt';
         $this->tmpStatusLogFilePath = TESTS_TEMP_DIR . '/update_status.log';
-        $this->updateInProgressFlagFilePath = TESTS_TEMP_DIR . '/update_in_rogress.flag';
+        $this->updateInProgressFlagFilePath = TESTS_TEMP_DIR . '/update_in_progress.flag';
+        $this->updateErrorFlagFilePath = TESTS_TEMP_DIR . '/update_error.flag';
 
         $statusFileContent = file_get_contents($this->statusFilePath);
         /** Prepare temporary status file which can be modified */
@@ -61,6 +67,9 @@ class StatusTest extends \PHPUnit_Framework_TestCase
         }
         if (file_exists($this->updateInProgressFlagFilePath)) {
             unlink($this->updateInProgressFlagFilePath);
+        }
+        if (file_exists($this->updateErrorFlagFilePath)) {
+            unlink($this->updateErrorFlagFilePath);
         }
     }
 
@@ -224,6 +233,26 @@ STATUS_UPDATE;
 
         $this->assertInstanceOf('Magento\Update\Status', $status->setUpdateInProgress(true));
         $this->assertTrue($status->isUpdateInProgress());
+    }
+
+    public function testIsUpdateError()
+    {
+        $status = new \Magento\Update\Status(
+            $this->tmpStatusFilePath,
+            $this->tmpStatusLogFilePath,
+            $this->updateInProgressFlagFilePath,
+            $this->updateErrorFlagFilePath
+        );
+        $this->assertFalse($status->isUpdateError());
+
+        $this->assertInstanceOf('Magento\Update\Status', $status->setUpdateError());
+        $this->assertTrue($status->isUpdateError());
+
+        $this->assertInstanceOf('Magento\Update\Status', $status->setUpdateError(false));
+        $this->assertFalse($status->isUpdateError());
+
+        $this->assertInstanceOf('Magento\Update\Status', $status->setUpdateError(true));
+        $this->assertTrue($status->isUpdateError());
     }
 
     /**

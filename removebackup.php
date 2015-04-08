@@ -6,7 +6,7 @@
 
 require_once __DIR__ . '/app/bootstrap.php';
 
-$filesToDelete = array();
+$filesToDelete = [];
 
 while (true) {
     $input = trim(readline("Please enter the file name of the backup to be deleted. "

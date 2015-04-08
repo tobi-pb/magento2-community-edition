@@ -38,19 +38,34 @@ class Status
     protected $updateInProgressFlagFilePath;
 
     /**
+     * Path to a flag, which exists when error occurred during updater app execution.
+     *
+     * @var string
+     */
+    protected $updateErrorFlagFilePath;
+
+    /**
      * Initialize.
      *
      * @param string|null $statusFilePath
      * @param string|null $logFilePath
      * @param string|null $updateInProgressFlagFilePath
+     * @param string|null $updateErrorFlagFilePath
      */
-    public function __construct($statusFilePath = null, $logFilePath = null, $updateInProgressFlagFilePath = null)
-    {
+    public function __construct(
+        $statusFilePath = null,
+        $logFilePath = null,
+        $updateInProgressFlagFilePath = null,
+        $updateErrorFlagFilePath = null
+    ) {
         $this->statusFilePath = $statusFilePath ? $statusFilePath : UPDATER_BP . '/var/.update_status.txt';
         $this->logFilePath = $logFilePath ? $logFilePath : UPDATER_BP . '/var/update_status.log';
         $this->updateInProgressFlagFilePath = $updateInProgressFlagFilePath
             ? $updateInProgressFlagFilePath
             : UPDATER_BP . '/var/.update_in_progress.flag';
+        $this->updateErrorFlagFilePath = $updateErrorFlagFilePath
+            ? $updateErrorFlagFilePath
+            : UPDATER_BP . '/var/.update_error.flag';
     }
 
     /**
@@ -174,14 +189,47 @@ class Status
      */
     public function setUpdateInProgress($isInProgress = true)
     {
-        if ($isInProgress) {
-            $updateInProgressFlagFile = fopen($this->updateInProgressFlagFilePath, 'w');
+        return $this->setFlagValue($this->updateInProgressFlagFilePath, $isInProgress);
+    }
+
+    /**
+     * Check if error has occurred during updater application execution.
+     *
+     * @return bool
+     */
+    public function isUpdateError()
+    {
+        return file_exists($this->updateErrorFlagFilePath);
+    }
+
+    /**
+     * Set current updater app status: true if error occurred during update app execution, false otherwise.
+     *
+     * @param bool $isErrorOccurred
+     * @return $this
+     */
+    public function setUpdateError($isErrorOccurred = true)
+    {
+        return $this->setFlagValue($this->updateErrorFlagFilePath, $isErrorOccurred);
+    }
+
+    /**
+     * Create flag in case when value is set to 'true', remove it if value is set to 'false'.
+     *
+     * @param string $pathToFlagFile
+     * @param bool $value
+     * @return $this
+     */
+    protected function setFlagValue($pathToFlagFile, $value)
+    {
+        if ($value) {
+            $updateInProgressFlagFile = fopen($pathToFlagFile, 'w');
             if (!$updateInProgressFlagFile) {
-                throw new \RuntimeException(sprintf('"%s" cannot be created.', $this->updateInProgressFlagFilePath));
+                throw new \RuntimeException(sprintf('"%s" cannot be created.', $pathToFlagFile));
             }
             fclose($updateInProgressFlagFile);
-        } else if (file_exists($this->updateInProgressFlagFilePath)) {
-            unlink($this->updateInProgressFlagFilePath);
+        } else if (file_exists($pathToFlagFile)) {
+            unlink($pathToFlagFile);
         }
         return $this;
     }
