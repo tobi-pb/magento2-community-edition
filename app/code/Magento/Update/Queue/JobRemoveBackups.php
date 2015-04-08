@@ -25,7 +25,7 @@ class JobRemoveBackups extends AbstractJob
             $filesToDelete = $this->params[self::BACKUPS_FILE_NAMES];
         }
         $removeBackup = new RemoveBackup($filesToDelete);
-        $removeBackup->run();
+        $this->jobStatus->add($removeBackup->run());
         return $this;
     }
 }

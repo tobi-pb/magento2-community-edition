@@ -30,14 +30,15 @@ class RemoveBackup
     public function run()
     {
         if (file_exists(UPDATER_BP . self::MAINTENANCE_FLAG_FILE) ||
-            file_exists(UPDATER_BP . self::UPDATE_ERROR_FLAG_FILE)) {
+            file_exists(UPDATER_BP . self::UPDATE_ERROR_FLAG_FILE))
+        {
             throw new \Exception("Cannot remove archives while setup is in progress");
             return;
         }
         $status = '';
         foreach ($this->filesToDelete as $file) {
             if (!file_exists($this->backupPath . $file) || !unlink($this->backupPath . $file)) {
-                throw new \Exception("Could not delete backup archive " . $file);
+                throw new \RuntimeException("Could not delete backup archive " . $file);
             } else {
                 $status .= $file . " was deleted successfully.\n";
             }

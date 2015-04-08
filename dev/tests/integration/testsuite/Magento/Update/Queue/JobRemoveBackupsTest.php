@@ -5,6 +5,8 @@
  */
 namespace Magento\Update\Queue;
 
+use Magento\Update\RemoveBackup;
+
 class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \Magento\Update\Queue\JobRemoveBackups */
@@ -37,11 +39,11 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         if (file_exists($this->backupPath . $this->backupFilenameC)) {
             unlink($this->backupPath . $this->backupFilenameC);
         }
-        if (file_exists(UPDATER_BP . \Magento\Update\Queue\JobRemoveBackups::UPDATE_ERROR_FLAG_FILE)) {
-            unlink(UPDATER_BP . \Magento\Update\Queue\JobRemoveBackups::UPDATE_ERROR_FLAG_FILE);
+        if (file_exists(UPDATER_BP . RemoveBackup::UPDATE_ERROR_FLAG_FILE)) {
+            unlink(UPDATER_BP . RemoveBackup::UPDATE_ERROR_FLAG_FILE);
         }
-        if (file_exists(UPDATER_BP . \Magento\Update\Queue\JobRemoveBackups::MAINTENANCE_FLAG_FILE)) {
-            unlink(UPDATER_BP . \Magento\Update\Queue\JobRemoveBackups::MAINTENANCE_FLAG_FILE);
+        if (file_exists(UPDATER_BP . RemoveBackup::MAINTENANCE_FLAG_FILE)) {
+            unlink(UPDATER_BP . RemoveBackup::MAINTENANCE_FLAG_FILE);
         }
     }
 
@@ -64,8 +66,8 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
 
     public function flagFileDataProvider() {
         return [
-            [UPDATER_BP . \Magento\Update\Queue\JobRemoveBackups::MAINTENANCE_FLAG_FILE],
-            [UPDATER_BP . \Magento\Update\Queue\JobRemoveBackups::UPDATE_ERROR_FLAG_FILE]
+            [UPDATER_BP . RemoveBackup::MAINTENANCE_FLAG_FILE],
+            [UPDATER_BP . RemoveBackup::UPDATE_ERROR_FLAG_FILE]
         ];
     }
 
