@@ -19,7 +19,7 @@ abstract class AbstractJob
     protected $name;
 
     /**
-     * @var object
+     * @var array
      */
     protected $params;
 
@@ -32,7 +32,7 @@ abstract class AbstractJob
      * Initialize job instance.
      *
      * @param string $name
-     * @param object $params
+     * @param array $params
      * @param \Magento\Update\Status|null $jobStatus
      */
     public function __construct($name, $params, \Magento\Update\Status $jobStatus = null)

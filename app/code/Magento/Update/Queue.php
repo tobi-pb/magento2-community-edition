@@ -64,7 +64,7 @@ class Queue
             /** @var object $job */
             foreach ($queue->{self::KEY_JOBS} as $job) {
                 $this->validateJobDeclaration($job);
-                $jobs[] = $this->jobFactory->create($job->{self::KEY_JOB_NAME}, $job->{self::KEY_JOB_PARAMS});
+                $jobs[] = $this->jobFactory->create($job->{self::KEY_JOB_NAME}, (array)$job->{self::KEY_JOB_PARAMS});
             }
         } else {
             throw new \RuntimeException(sprintf('"%s" field is missing or is not an array.', self::KEY_JOBS));

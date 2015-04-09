@@ -24,7 +24,7 @@ class JobFactory
      * Create job instance.
      *
      * @param string $name
-     * @param object $params
+     * @param array $params
      * @return AbstractJob
      * @throws \RuntimeException
      */
