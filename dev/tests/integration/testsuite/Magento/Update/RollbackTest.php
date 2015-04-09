@@ -22,12 +22,40 @@ class RollbackTest extends \PHPUnit_Framework_TestCase
      */
     protected $archivedDir;
 
+    /**
+     * @var string
+     */
+    protected $excludedDir;
+
+    /**
+     * @var string
+     */
+    protected $backupFileName;
+
     protected function setup()
     {
         parent::setUp();
         $this->backupPath = UPDATER_BP . '/dev/tests/integration/testsuite/Magento/Update/_files/backup/';
         $this->archivedDir = UPDATER_BP . '/dev/tests/integration/testsuite/Magento/Update/_files/archived/';
-        $this->rollBack = new \Magento\Update\Rollback($this->backupPath, $this->archivedDir);
+        $this->excludedDir = UPDATER_BP . '/dev/tests/integration/testsuite/Magento/Update/_files/archived/excluded/';
+        mkdir($this->backupPath);
+        mkdir($this->archivedDir);
+        mkdir($this->excludedDir);
+        $this->backupFileName = uniqid('test_backup') . '.zip';
+        $this->rollBack = new \Magento\Update\Rollback($this->backupPath);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        $this->autoRollbackHelper(2);
+        if (file_exists($this->backupPath . $this->backupFileName)) {
+            unlink($this->backupPath . $this->backupFileName);
+        }
+
+        rmdir($this->backupPath);
+        rmdir($this->excludedDir);
+        rmdir($this->archivedDir);
     }
 
     /**
@@ -42,16 +70,15 @@ class RollbackTest extends \PHPUnit_Framework_TestCase
     public function testAutoRollback()
     {
         // Setup
-        $backupFileName = uniqid('test_backup') . '.zip';
         $this->autoRollbackHelper();
 
         $backupInfo = $this->getMockBuilder('Magento\Update\Backup\BackupInfo')
             ->disableOriginalConstructor()
-            ->setMethods(['getBackupFilename', 'getBackupPath', 'getBlacklist', 'getArchivedDirectory'])
+            ->setMethods(['generateBackupFilename', 'getBackupPath', 'getBlacklist', 'getArchivedDirectory'])
             ->getMock();
         $backupInfo->expects($this->any())
-            ->method('getBackupFilename')
-            ->willReturn($backupFileName);
+            ->method('generateBackupFilename')
+            ->willReturn($this->backupFileName);
         $backupInfo->expects($this->any())
             ->method('getBackupPath')
             ->willReturn($this->backupPath);
@@ -60,11 +87,11 @@ class RollbackTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->archivedDir);
         $backupInfo->expects($this->any())
             ->method('getBlacklist')
-            ->willReturn([]);
+            ->willReturn([$this->excludedDir]);
 
         $archivator = new \Magento\Update\Backup\UnixZipArchive($backupInfo);
         $result = $archivator->archive();
-        $this->assertEquals($backupFileName, $result);
+        $this->assertEquals($this->backupFileName, $result);
 
         // Change the contents of a.txt
         $this->autoRollbackHelper(1);
@@ -75,10 +102,6 @@ class RollbackTest extends \PHPUnit_Framework_TestCase
 
         // Assert that the contents of a.txt has been restored properly
         $this->assertEquals('foo', file_get_contents($this->archivedDir . 'a.txt'));
-
-        // Tear down
-        $this->autoRollbackHelper(2);
-        unlink($this->backupPath . $backupFileName);
     }
 
     /**
@@ -99,9 +122,15 @@ class RollbackTest extends \PHPUnit_Framework_TestCase
         } elseif ($flag === 1) {
             file_put_contents($this->archivedDir . $fileA, 'foo changed');
         } elseif ($flag === 2) {
-            unlink($this->archivedDir . $fileA);
-            unlink($this->archivedDir . $fileB);
-            unlink($this->archivedDir . $fileC);
+            if (file_exists($this->archivedDir . $fileA)) {
+                unlink($this->archivedDir . $fileA);
+            }
+            if (file_exists($this->archivedDir . $fileB)) {
+                unlink($this->archivedDir . $fileB);
+            }
+            if (file_exists($this->archivedDir . $fileC)) {
+                unlink($this->archivedDir . $fileC);
+            }
         }
     }
 }
