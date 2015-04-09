@@ -33,9 +33,9 @@ abstract class AbstractJob
      *
      * @param string $name
      * @param object $params
-     * @param \Magento\Update\Status $jobStatus
+     * @param \Magento\Update\Status|null $jobStatus
      */
-    public function __construct($name, $params, $jobStatus = null)
+    public function __construct($name, $params, \Magento\Update\Status $jobStatus = null)
     {
         $this->name = $name;
         $this->params = $params;
@@ -66,6 +66,7 @@ abstract class AbstractJob
      * Execute job.
      *
      * @return $this
+     * @throws \RuntimeException
      */
     abstract public function execute();
 }

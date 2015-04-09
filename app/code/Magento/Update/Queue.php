@@ -36,8 +36,8 @@ class Queue
     /**
      * Initialize dependencies.
      *
-     * @param Reader $reader
-     * @param JobFactory $jobFactory
+     * @param Reader|null $reader
+     * @param JobFactory|null $jobFactory
      */
     public function __construct(Reader $reader = null, JobFactory $jobFactory = null)
     {

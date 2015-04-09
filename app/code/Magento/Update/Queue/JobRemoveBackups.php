@@ -6,36 +6,57 @@
 
 namespace Magento\Update\Queue;
 
+use Magento\Update\Queue\MaintenanceMode;
+
 /**
  * Magento updater application 'remove_backups' job.
  */
 class JobRemoveBackups extends AbstractJob
 {
     const BACKUPS_FILE_NAMES = 'backups_file_names';
-    const MAINTENANCE_FLAG_FILE = '/var/.maintenance.flag';
 
+    /**
+     * @var MaintenanceMode
+     */
+    protected $maintenanceMode;
+
+    /**
+     * Initialize job instance.
+     *
+     * @param string $name
+     * @param object $params
+     * @param \Magento\Update\Status|null $jobStatus
+     * @param MaintenanceMode|null $maintenanceMode
+     */
+    public function __construct(
+        $name,
+        $params,
+        \Magento\Update\Status $jobStatus = null,
+        MaintenanceMode $maintenanceMode = null
+    ) {
+        parent::__construct($name, $params, $jobStatus);
+        $this->maintenanceMode = $maintenanceMode ? $maintenanceMode : new MaintenanceMode();
+    }
+    
     /**
      * {@inheritdoc}
      */
     public function execute()
     {
-        $backupPath = UPDATER_BP . '/var/backup/';
+        $backupDirPath = UPDATER_BP . '/var/backup/';
         $filesToDelete = [];
         if (isset($this->params[self::BACKUPS_FILE_NAMES])) {
             $filesToDelete = $this->params[self::BACKUPS_FILE_NAMES];
         }
-        if (
-            file_exists(UPDATER_BP . self::MAINTENANCE_FLAG_FILE) ||
-            $this->jobStatus->isUpdateError()
-        ) {
-            throw new \Exception("Cannot remove archives while setup is in progress");
-            return;
+        if ($this->maintenanceMode->isOn() || $this->jobStatus->isUpdateError()) {
+            throw new \RuntimeException("Cannot remove backup archives while setup is in progress.");
         }
-        foreach ($filesToDelete as $file) {
-            if (!file_exists($backupPath . $file) || !unlink($backupPath . $file)) {
-                throw new \RuntimeException("Could not delete backup archive " . $file);
+        foreach ($filesToDelete as $archiveFileName) {
+            $archivePath = $backupDirPath . $archiveFileName;
+            if (file_exists($archivePath) && unlink($archivePath)) {
+                $this->jobStatus->add(sprintf('"%s" was deleted successfully.', $archivePath));
             } else {
-                $this->jobStatus->add(sprintf('%s was deleted successfully.\n', $file));
+                throw new \RuntimeException(sprintf('Could not delete backup archive "%s"', $archivePath));
             }
         }
     }

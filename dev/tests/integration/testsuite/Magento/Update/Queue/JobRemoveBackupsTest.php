@@ -27,7 +27,7 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         $this->backupFilenameB = uniqid('test_backupB') . '.zip';
         $this->backupFilenameC = uniqid('test_backupC') . '.zip';
         $this->backupPath = UPDATER_BP . '/var/backup/';
-        $this->maintenanceFlagFilePath = UPDATER_BP . JobRemoveBackups::MAINTENANCE_FLAG_FILE;
+        $this->maintenanceFlagFilePath = UPDATER_BP . '/var/.maintenance.flag';
         $this->updateErrorFlagFilePath = UPDATER_BP . '/var/.update_error.flag';
     }
 
@@ -53,8 +53,8 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider flagFileDataProvider
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cannot remove archives while setup is in progress
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Cannot remove backup archives while setup is in progress.
      */
     public function testExecuteFlag($flag)
     {
@@ -70,13 +70,13 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
 
     public function flagFileDataProvider() {
         return [
-            [UPDATER_BP . JobRemoveBackups::MAINTENANCE_FLAG_FILE],
+            [UPDATER_BP . '/var/.maintenance.flag'],
             [UPDATER_BP . '/var/.update_error.flag']
         ];
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage Could not delete backup archive
      */
     public function testExecuteInvalidBackupFile()

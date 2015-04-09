@@ -15,8 +15,6 @@ use Magento\Update\Backup\UnixZipArchive;
  */
 class JobBackup extends AbstractJob
 {
-    // TODO: Add job specific getters and there initialization based on construct params in scope of https://jira.corp.x.com/browse/MAGETWO-35312
-
     /** @var \Magento\Update\Backup\BackupInfo */
     protected $backupInfo;
 
@@ -25,10 +23,10 @@ class JobBackup extends AbstractJob
      *
      * @param string $name
      * @param object $params
-     * @param \Magento\Update\Status $jobStatus
-     * @param \Magento\Update\Backup\BackupInfo $backupInfo
+     * @param \Magento\Update\Status|null $jobStatus
+     * @param \Magento\Update\Backup\BackupInfo|null $backupInfo
      */
-    public function __construct($name, $params, $jobStatus = null, $backupInfo = null)
+    public function __construct($name, $params, \Magento\Update\Status $jobStatus = null, $backupInfo = null)
     {
         parent::__construct($name, $params, $jobStatus);
         $this->backupInfo = $backupInfo ? $backupInfo : new BackupInfo();
