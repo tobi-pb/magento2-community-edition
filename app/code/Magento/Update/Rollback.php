@@ -29,7 +29,7 @@ class Rollback
      */
     public function __construct($backupFileDir = null, $restoreTargetDir = null)
     {
-        $this->backupFileDir = $backupFileDir ? $backupFileDir : UPDATER_BP . '/var/backup/';
+        $this->backupFileDir = $backupFileDir ? $backupFileDir : UPDATER_BACKUP_DIR;
         $this->restoreTargetDir = $restoreTargetDir ? $restoreTargetDir : MAGENTO_BP;
     }
 
@@ -66,7 +66,7 @@ class Rollback
     }
 
     /**
-     * Find the last backup file from var/backup
+     * Find the last backup file from backup directory
      *
      * @throws \Exception
      * @return string

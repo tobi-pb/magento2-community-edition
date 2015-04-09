@@ -6,6 +6,9 @@
 
 namespace Magento\Update\Backup;
 
+/**
+ * Class for backup archive creating using command line zip utility.
+ */
 class UnixZipArchive implements ArchiveInterface
 {
     /** @var  \Magento\Update\Backup\BackupInfo */
@@ -28,8 +31,8 @@ class UnixZipArchive implements ArchiveInterface
      */
     public function archive()
     {
-        $backupFileName = $this->backupInfo->getBackupFilename();
-        $backupFilePath = $this->backupInfo->getBackupPath() . DIRECTORY_SEPARATOR . $backupFileName;
+        $backupFileName = $this->backupInfo->generateBackupFilename();
+        $backupFilePath = $this->backupInfo->getBackupPath() . '/' . $backupFileName;
         $archivedDirectory = $this->backupInfo->getArchivedDirectory() . '/*';
         $excludedElements = '';
 

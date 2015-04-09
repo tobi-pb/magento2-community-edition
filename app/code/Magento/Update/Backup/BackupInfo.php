@@ -6,32 +6,38 @@
 
 namespace Magento\Update\Backup;
 
+/**
+ * Data object, which stores information about files to be archived.
+ */
 class BackupInfo
 {
-    /** @var string */
-    protected $blacklistFilename = 'backup_blacklist.txt';
+    /**
+     * @var string
+     */
+    protected $blacklistFilePath;
 
-    /** @var  array */
+    /**
+     * @var string[]
+     */
     protected $blacklist;
 
     /**
      * Init backup info
      *
-     * @throws \Exception
+     * @param string $blacklistFilePath
      */
-    public function __construct()
+    public function __construct($blacklistFilePath = null)
     {
-        $this->blacklist = $this->readBlacklist();
+        $this->blacklistFilePath = $blacklistFilePath ? $blacklistFilePath : __DIR__ . '/../etc/backup_blacklist.txt';
     }
 
     /**
-     * Return backup filename
+     * Generate backup filename based on current timestamp.
      *
      * @return string
      */
-    public function getBackupFilename()
+    public function generateBackupFilename()
     {
-        date_default_timezone_set('UTC');
         $currentDate = date('Y-m-d-H-i-s', time());
         return 'backup-' . $currentDate . '.zip';
     }
@@ -39,15 +45,31 @@ class BackupInfo
     /**
      * Return files/directories, which need to be excluded from backup
      *
-     * @return array
+     * @return string[]
      */
     public function getBlacklist()
     {
+        if (null === $this->blacklist) {
+            $blacklistContent = file_get_contents($this->blacklistFilePath);
+            if ($blacklistContent === FALSE) {
+                throw new \RuntimeException('Could not read the blacklist file: ' . $this->blacklistFilePath);
+            }
+            /** Ignore commented and empty lines */
+            $blacklistArray = explode("\n", $blacklistContent);
+            $blacklistArray = array_filter(
+                $blacklistArray,
+                function ($value) {
+                    $value = trim($value);
+                    return (empty($value) || strpos($value, '#') === 0) ? false : true;
+                }
+            );
+            $this->blacklist = $blacklistArray;
+        }
         return $this->blacklist;
     }
 
     /**
-     * Return absolute directory, which need to be archived
+     * Return path to a directory, which need to be archived
      *
      * @return string
      */
@@ -63,30 +85,6 @@ class BackupInfo
      */
     public function getBackupPath()
     {
-        return UPDATER_BP . '/var/backup';
-    }
-
-    /**
-     * Read files/directories, which need to be excluded from backup
-     *
-     * @return array
-     * @throws \Exception
-     */
-    protected function readBlacklist()
-    {
-        $blacklistPath = __DIR__ . '/../' . 'etc' . '/';
-        $blacklistContent = file_get_contents($blacklistPath . $this->blacklistFilename);
-        if ($blacklistContent === FALSE) {
-            throw new \Exception('Could not read the blacklist file:' . $this->blacklistFilename);
-        }
-        $blacklistArray = explode("\n", $blacklistContent);
-        $blacklistArray = array_filter(
-            $blacklistArray,
-            function ($value) {
-                $value = trim($value);
-                return (empty($value) || strpos($value, '#') === 0) ? false : true;
-            }
-        );
-        return $blacklistArray;
+        return UPDATER_BACKUP_DIR;
     }
 }

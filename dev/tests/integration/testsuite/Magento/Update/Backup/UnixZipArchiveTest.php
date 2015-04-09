@@ -35,7 +35,7 @@ class PhpZipArchiveTest extends \PHPUnit_Framework_TestCase
         }
         $backupInfo = $this->getMockBuilder('Magento\Update\Backup\BackupInfo')
             ->disableOriginalConstructor()
-            ->setMethods(['getBackupFilename','getBlacklist', 'getArchivedDirectory'])
+            ->setMethods(['getBackupFilename', 'getBlacklist', 'getArchivedDirectory'])
             ->getMock();
         $backupInfo->expects($this->any())
             ->method('getBackupFilename')

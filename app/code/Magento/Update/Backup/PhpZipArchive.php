@@ -12,7 +12,7 @@ class PhpZipArchive implements ArchiveInterface
     protected $backupInfo;
 
     /**
-     * Init  archivator
+     * Init archivator
      *
      * @param BackupInfo $backupInfo
      */
@@ -30,8 +30,8 @@ class PhpZipArchive implements ArchiveInterface
     {
         $zip = new \ZipArchive();
 
-        $backupFileName = $this->backupInfo->getBackupFilename();
-        $backupFilePath = $this->backupInfo->getBackupPath() . DIRECTORY_SEPARATOR . $backupFileName;
+        $backupFileName = $this->backupInfo->generateBackupFilename();
+        $backupFilePath = $this->backupInfo->getBackupPath() . '/' . $backupFileName;
 
         if ($zip->open($backupFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
             throw new \Exception("Could not open archive for backup");
@@ -40,7 +40,7 @@ class PhpZipArchive implements ArchiveInterface
         $iterator = $this->getRecursiveDirectoryIterator();
 
         foreach ($iterator as $key => $value) {
-            $relativePath = str_replace($this->backupInfo->getArchivedDirectory() . DIRECTORY_SEPARATOR, '', $key);
+            $relativePath = str_replace($this->backupInfo->getArchivedDirectory() . '/', '', $key);
             if (is_dir($key)) {
                 if ($zip->addEmptyDir($relativePath) !== true) {
                     throw new \Exception ("Could not add dir: $key");

@@ -43,7 +43,7 @@ class JobRemoveBackups extends AbstractJob
      */
     public function execute()
     {
-        $backupDirPath = UPDATER_BP . '/var/backup/';
+        $backupDirPath = UPDATER_BACKUP_DIR;
         $filesToDelete = [];
         if (isset($this->params[self::BACKUPS_FILE_NAMES])) {
             $filesToDelete = $this->params[self::BACKUPS_FILE_NAMES];
