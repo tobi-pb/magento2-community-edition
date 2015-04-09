@@ -5,8 +5,6 @@
  */
 namespace Magento\Update\Queue;
 
-use Magento\Update\RemoveBackup;
-
 class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \Magento\Update\Queue\JobRemoveBackups */
@@ -18,6 +16,10 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $backupPath;
 
+    protected $maintenanceFlagFilePath;
+
+    protected $updateErrorFlagFilePath;
+
     protected function setUp()
     {
         parent::setUp();
@@ -25,6 +27,8 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         $this->backupFilenameB = uniqid('test_backupB') . '.zip';
         $this->backupFilenameC = uniqid('test_backupC') . '.zip';
         $this->backupPath = UPDATER_BP . '/var/backup/';
+        $this->maintenanceFlagFilePath = UPDATER_BP . JobRemoveBackups::MAINTENANCE_FLAG_FILE;
+        $this->updateErrorFlagFilePath = UPDATER_BP . '/var/.update_error.flag';
     }
 
     protected function tearDown()
@@ -39,11 +43,11 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         if (file_exists($this->backupPath . $this->backupFilenameC)) {
             unlink($this->backupPath . $this->backupFilenameC);
         }
-        if (file_exists(UPDATER_BP . RemoveBackup::UPDATE_ERROR_FLAG_FILE)) {
-            unlink(UPDATER_BP . RemoveBackup::UPDATE_ERROR_FLAG_FILE);
+        if (file_exists($this->maintenanceFlagFilePath)) {
+            unlink($this->maintenanceFlagFilePath);
         }
-        if (file_exists(UPDATER_BP . RemoveBackup::MAINTENANCE_FLAG_FILE)) {
-            unlink(UPDATER_BP . RemoveBackup::MAINTENANCE_FLAG_FILE);
+        if (file_exists($this->updateErrorFlagFilePath)) {
+            unlink($this->updateErrorFlagFilePath);
         }
     }
 
@@ -66,8 +70,8 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
 
     public function flagFileDataProvider() {
         return [
-            [UPDATER_BP . RemoveBackup::MAINTENANCE_FLAG_FILE],
-            [UPDATER_BP . RemoveBackup::UPDATE_ERROR_FLAG_FILE]
+            [UPDATER_BP . JobRemoveBackups::MAINTENANCE_FLAG_FILE],
+            [UPDATER_BP . '/var/.update_error.flag']
         ];
     }
 
