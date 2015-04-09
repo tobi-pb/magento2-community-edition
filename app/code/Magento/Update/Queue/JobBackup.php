@@ -7,8 +7,7 @@
 namespace Magento\Update\Queue;
 
 use Magento\Update\Backup\BackupInfo;
-use Magento\Update\Backup\PhpZipArchive;
-use Magento\Update\Backup\UnixZipArchive;
+use \Magento\Update\Backup;
 
 /**
  * Magento updater application 'backup' job.
@@ -29,7 +28,8 @@ class JobBackup extends AbstractJob
     public function __construct($name, $params, \Magento\Update\Status $jobStatus = null, $backupInfo = null)
     {
         parent::__construct($name, $params, $jobStatus);
-        $this->backupInfo = $backupInfo ? $backupInfo : new BackupInfo();
+        $backupInfo = $backupInfo ? $backupInfo : new BackupInfo();
+        $this->backup = new Backup($backupInfo);
     }
 
     /**
@@ -37,23 +37,7 @@ class JobBackup extends AbstractJob
      */
     public function execute()
     {
-        $archivator = $this->createArchivator($this->backupInfo);
-        $this->jobStatus->add(sprintf('%s: Backup %s has been created', $this->getName(), $archivator->archive()));
+        $this->jobStatus->add(sprintf('%s: Backup %s has been created', $this->getName(), $this->backup->execute()));
         return $this;
-    }
-
-    /**
-     * Return concrete archivator
-     *
-     * @param \Magento\Update\Backup\BackupInfo $backupInfo
-     * @return \Magento\Update\Backup\ArchiveInterface
-     */
-    protected function createArchivator($backupInfo)
-    {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            return new PhpZipArchive($backupInfo);
-        } else {
-            return new UnixZipArchive($backupInfo);
-        }
     }
 }
