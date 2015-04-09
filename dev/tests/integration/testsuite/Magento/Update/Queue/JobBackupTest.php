@@ -31,10 +31,10 @@ class JobBackupTest extends \PHPUnit_Framework_TestCase
 
         $backupInfo = $this->getMockBuilder('Magento\Update\Backup\BackupInfo')
             ->disableOriginalConstructor()
-            ->setMethods(['getBackupFilename','getBlacklist', 'getArchivedDirectory'])
+            ->setMethods(['generateBackupFilename', 'getBlacklist', 'getArchivedDirectory'])
             ->getMock();
         $backupInfo->expects($this->any())
-            ->method('getBackupFilename')
+            ->method('generateBackupFilename')
             ->willReturn($this->backupFilename);
         $backupInfo->expects($this->any())
             ->method('getArchivedDirectory')
