@@ -20,12 +20,11 @@ class JobRollback extends AbstractJob
      */
     public function execute()
     {
-        $backupFilePath = '';
-        if (isset($this->params[self::BACKUP_FILE_NAME])) {
-            $backupFilePath = $this->params[self::BACKUP_FILE_NAME];
+        if (!isset($this->params[self::BACKUP_FILE_NAME])) {
+            throw new \Exception ('Missing required parameter: ' . self::BACKUP_FILE_NAME);
         }
         $rollBack = new Rollback();
-        $rollBack->manualRollback($backupFilePath);
+        $rollBack->manualRollback($this->params[self::BACKUP_FILE_NAME]);
         return $this;
     }
 }
