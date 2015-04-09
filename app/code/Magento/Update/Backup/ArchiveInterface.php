@@ -6,9 +6,14 @@
 
 namespace Magento\Update\Backup;
 
+/**
+ * Archive interface
+ */
 interface ArchiveInterface
 {
     /**
+     * Archive data
+     *
      * @return string Backup filename
      * @throws \Exception
      */

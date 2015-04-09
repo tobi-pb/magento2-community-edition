@@ -6,6 +6,9 @@
 
 namespace Magento\Update\Backup\PhpArchivator;
 
+/**
+ *  Recursive iterator with blacklist filter
+ */
 class BlacklistFilterIterator extends \RecursiveFilterIterator
 {
     /** @var array */
