@@ -28,8 +28,7 @@ class ComposerManager
      */
     public function __construct($composerConfigFileDir = null)
     {
-        // TODO: replace UPDATER_BP with MAGENTO_BP
-        $this->composerConfigFileDir = $composerConfigFileDir ? $composerConfigFileDir : UPDATER_BP;
+        $this->composerConfigFileDir = $composerConfigFileDir ? $composerConfigFileDir : MAGENTO_BP;
     }
 
     /**
