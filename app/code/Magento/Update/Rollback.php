@@ -17,13 +17,20 @@ class Rollback
     protected $backupFileDir;
 
     /**
+     * @var string
+     */
+    protected $restoreTargetDir;
+
+    /**
      * Initialize rollback.
      *
      * @param string|null $backupFileDir
+     * @param string|null $restoreTargetDir
      */
-    public function __construct($backupFileDir = null)
+    public function __construct($backupFileDir = null, $restoreTargetDir = null)
     {
-        $this->backupFileDir = $backupFileDir ? $backupFileDir : UPDATER_BP . '/var/backup';
+        $this->backupFileDir = $backupFileDir ? $backupFileDir : UPDATER_BP . '/var/backup/';
+        $this->restoreTargetDir = $restoreTargetDir ? $restoreTargetDir : MAGENTO_BP;
     }
 
     /**
@@ -91,7 +98,7 @@ class Rollback
      */
     protected function rollbackHelper($backupFilePath)
     {
-        exec('unzip ' . $backupFilePath . ' -d ' . MAGENTO_BP, $output, $return);
+        exec('unzip ' . $backupFilePath . ' -d ' . $this->restoreTargetDir, $output, $return);
         if ($return) {
             throw new \Exception("Rollback was not successful.");
         }
