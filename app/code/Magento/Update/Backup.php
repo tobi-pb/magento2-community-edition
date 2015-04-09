@@ -6,7 +6,6 @@
 
 namespace Magento\Update;
 
-use Magento\Update\Backup\PhpZipArchive;
 use Magento\Update\Backup\UnixZipArchive;
 use Magento\Update\Backup\BackupInfo;
 
@@ -49,10 +48,6 @@ class Backup
      */
     protected function createArchivator($backupInfo)
     {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            return new PhpZipArchive($backupInfo);
-        } else {
-            return new UnixZipArchive($backupInfo);
-        }
+        return new UnixZipArchive($backupInfo);
     }
 }

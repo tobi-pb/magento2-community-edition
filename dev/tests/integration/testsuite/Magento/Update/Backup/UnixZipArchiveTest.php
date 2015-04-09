@@ -5,7 +5,7 @@
  */
 namespace Magento\Update\Backup;
 
-class PhpZipArchiveTest extends \PHPUnit_Framework_TestCase
+class UnixZipArchiveTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  string */
     protected $backupFilename;
