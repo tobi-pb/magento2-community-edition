@@ -43,7 +43,6 @@ class JobRemoveBackups extends AbstractJob
      */
     public function execute()
     {
-        $backupDirPath = UPDATER_BACKUP_DIR;
         $filesToDelete = [];
         if (isset($this->params[self::BACKUPS_FILE_NAMES])) {
             $filesToDelete = $this->params[self::BACKUPS_FILE_NAMES];
@@ -51,8 +50,7 @@ class JobRemoveBackups extends AbstractJob
         if ($this->maintenanceMode->isOn() || $this->jobStatus->isUpdateError()) {
             throw new \RuntimeException("Cannot remove backup archives while setup is in progress.");
         }
-        foreach ($filesToDelete as $archiveFileName) {
-            $archivePath = $backupDirPath . $archiveFileName;
+        foreach ($filesToDelete as $archivePath) {
             if (file_exists($archivePath) && unlink($archivePath)) {
                 $this->jobStatus->add(sprintf('"%s" was deleted successfully.', $archivePath));
             } else {
