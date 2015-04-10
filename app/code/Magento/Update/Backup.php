@@ -68,7 +68,7 @@ class Backup
         $excludedElements = '';
         foreach ($this->backupInfo->getBlacklist() as $excludedElement) {
             $elementPath = $excludedElement;
-            $fullPath = $this->backupInfo->getArchivedDirectory() . $elementPath;
+            $fullPath = $this->backupInfo->getArchivedDirectory() . '/' . $elementPath;
             $excludedElements .= is_dir($fullPath) ? $elementPath . '\* ' : $elementPath . ' ';
         }
         $changeDirectoryCommand = sprintf("cd %s", $this->backupInfo->getArchivedDirectory());

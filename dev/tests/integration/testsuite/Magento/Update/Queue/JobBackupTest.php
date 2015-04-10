@@ -62,7 +62,7 @@ class JobBackupTest extends \PHPUnit_Framework_TestCase
             ->willReturn(UPDATER_BP);
         $backupInfo->expects($this->any())
             ->method('getBlacklist')
-            ->willReturn(['/var/backup', '/vendor', '/app/code']);
+            ->willReturn(['var/backup', 'vendor', 'app/code']);
         $backupInfo->expects($this->any())
             ->method('getBackupPath')
             ->willReturn($this->backupPath);

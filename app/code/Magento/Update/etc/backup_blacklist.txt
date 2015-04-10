@@ -1,4 +1,4 @@
 # The list contains the paths relative to the directory that is archived
-/var
-/pub/static
-
+var
+pub/static
+update/var
