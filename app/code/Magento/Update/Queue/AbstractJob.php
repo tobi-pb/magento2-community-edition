@@ -26,20 +26,20 @@ abstract class AbstractJob
     /**
      * @var \Magento\Update\Status
      */
-    protected $jobStatus;
+    protected $status;
 
     /**
      * Initialize job instance.
      *
      * @param string $name
      * @param array $params
-     * @param \Magento\Update\Status|null $jobStatus
+     * @param \Magento\Update\Status|null $status
      */
-    public function __construct($name, array $params, \Magento\Update\Status $jobStatus = null)
+    public function __construct($name, array $params, \Magento\Update\Status $status = null)
     {
         $this->name = $name;
         $this->params = $params;
-        $this->jobStatus = $jobStatus ? $jobStatus : new Status();
+        $this->status = $status ? $status : new Status();
     }
 
     /**

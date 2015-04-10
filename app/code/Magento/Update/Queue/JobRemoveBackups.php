@@ -25,16 +25,16 @@ class JobRemoveBackups extends AbstractJob
      *
      * @param string $name
      * @param array $params
-     * @param \Magento\Update\Status|null $jobStatus
+     * @param \Magento\Update\Status|null $status
      * @param MaintenanceMode|null $maintenanceMode
      */
     public function __construct(
         $name,
         array $params,
-        \Magento\Update\Status $jobStatus = null,
+        \Magento\Update\Status $status = null,
         MaintenanceMode $maintenanceMode = null
     ) {
-        parent::__construct($name, $params, $jobStatus);
+        parent::__construct($name, $params, $status);
         $this->maintenanceMode = $maintenanceMode ? $maintenanceMode : new MaintenanceMode();
     }
     
@@ -47,12 +47,12 @@ class JobRemoveBackups extends AbstractJob
         if (isset($this->params[self::BACKUPS_FILE_NAMES])) {
             $filesToDelete = $this->params[self::BACKUPS_FILE_NAMES];
         }
-        if ($this->maintenanceMode->isOn() || $this->jobStatus->isUpdateError()) {
+        if ($this->maintenanceMode->isOn() || $this->status->isUpdateError()) {
             throw new \RuntimeException("Cannot remove backup archives while setup is in progress.");
         }
         foreach ($filesToDelete as $archivePath) {
             if (file_exists($archivePath) && unlink($archivePath)) {
-                $this->jobStatus->add(sprintf('"%s" was deleted successfully.', $archivePath));
+                $this->status->add(sprintf('"%s" was deleted successfully.', $archivePath));
             } else {
                 throw new \RuntimeException(sprintf('Could not delete backup archive "%s"', $archivePath));
             }

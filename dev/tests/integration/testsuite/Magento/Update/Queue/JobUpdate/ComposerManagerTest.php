@@ -48,7 +48,7 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage  Composer directive "nonSupport" is not supported
+     * @expectedExceptionMessage Composer directive "nonSupport" is not supported
      */
     public function testUpdateComposerConfigFileNonSupportedDirective()
     {
@@ -58,7 +58,7 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage  Incorrect/missing parameters for composer directive "require"
+     * @expectedExceptionMessage Incorrect/missing parameters for composer directive "require"
      */
     public function testUpdateComposerConfigFileMissedParam()
     {
