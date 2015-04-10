@@ -18,8 +18,8 @@ class ComposerManager
     const COMPOSER_REQUIRE = 'require';
     /**#@-*/
 
-    const PACKAGE_NAME = 'name';
-    const PACKAGE_VERSION = 'version';
+    const PACKAGE_NAME = 'package_name';
+    const PACKAGE_VERSION = 'package_version';
 
     /** @var string */
     protected $composerConfigFileDir;
@@ -49,7 +49,7 @@ class ComposerManager
         }
         $directiveHandler = sprintf('update%sDirective', $camelCaseDirective);
         if (!method_exists($this, $directiveHandler)) {
-            throw new \LogicException(sprintf('Composer\'s directive "%s" is not supported', $directive));
+            throw new \LogicException(sprintf('Composer directive "%s" is not supported', $directive));
         }
         return call_user_func([$this, $directiveHandler], $params);
     }
@@ -77,7 +77,7 @@ class ComposerManager
         $commandParams = '';
         foreach ($params as $param) {
             if (!isset($param[self::PACKAGE_NAME]) || !isset($param[self::PACKAGE_VERSION])) {
-                throw new \RuntimeException('Incorrect/missing parameters for composer\'s directive "require"');
+                throw new \RuntimeException('Incorrect/missing parameters for composer directive "require"');
             }
             $commandParams .= $param[self::PACKAGE_NAME] . ':' . $param[self::PACKAGE_VERSION] . ' ';
         }
@@ -96,7 +96,7 @@ class ComposerManager
     protected function runComposerCommand($command, $commandParams = null)
     {
         $fullCommand = sprintf(
-            'cd %s &&  php -f %s/vendor/composer/composer/bin/composer %s %s',
+            'cd %s && php -f %s/vendor/composer/composer/bin/composer %s %s',
             $this->composerConfigFileDir,
             UPDATER_BP,
             $command,

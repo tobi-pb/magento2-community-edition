@@ -26,8 +26,8 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
         $this->composerConfigFilePath = $this->composerConfigFileDir . '/composer.json';
         copy(__DIR__ . '/../../_files/composer.json', $this->composerConfigFilePath);
         $this->expectedRequireDirectiveParam = [
-            ["name" => "php", "version" => "~5.6.0"],
-            ["name" => "composer/composer", "version" => "1.0.0-alpha8"]
+            [ComposerManager::PACKAGE_NAME => "php", ComposerManager::PACKAGE_VERSION => "~5.6.0"],
+            [ComposerManager::PACKAGE_NAME => "composer/composer", ComposerManager::PACKAGE_VERSION => "1.0.0-alpha8"]
         ];
     }
 
@@ -48,7 +48,7 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage  Composer's directive "nonSupport" is not supported
+     * @expectedExceptionMessage  Composer directive "nonSupport" is not supported
      */
     public function testUpdateComposerConfigFileNonSupportedDirective()
     {
@@ -58,12 +58,12 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage  Incorrect/missing parameters for composer's directive "require"
+     * @expectedExceptionMessage  Incorrect/missing parameters for composer directive "require"
      */
     public function testUpdateComposerConfigFileMissedParam()
     {
         $expectedRequireDirectiveParam = [
-            ["name" => "php"],
+            [ComposerManager::PACKAGE_NAME => "php"],
         ];
         $composerManager = new ComposerManager($this->composerConfigFileDir);
         $composerManager->updateComposerConfigFile('require', $expectedRequireDirectiveParam);
