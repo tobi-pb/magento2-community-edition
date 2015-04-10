@@ -77,8 +77,8 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteFlag($isMaintenanceModeOn, $isUpdaterError)
     {
-        /** @var \Magento\Update\Queue\MaintenanceMode $maintenanceModeMock */
-        $maintenanceModeMock = $this->getMockBuilder('Magento\Update\Queue\MaintenanceMode')
+        /** @var \Magento\Update\MaintenanceMode $maintenanceModeMock */
+        $maintenanceModeMock = $this->getMockBuilder('Magento\Update\MaintenanceMode')
             ->disableOriginalConstructor()
             ->getMock();
         $maintenanceModeMock->expects($this->any())->method('isOn')->willReturn($isMaintenanceModeOn);

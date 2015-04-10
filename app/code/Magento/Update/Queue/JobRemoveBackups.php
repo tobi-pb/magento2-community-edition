@@ -6,7 +6,7 @@
 
 namespace Magento\Update\Queue;
 
-use Magento\Update\Queue\MaintenanceMode;
+use Magento\Update\MaintenanceMode;
 
 /**
  * Magento updater application 'remove_backups' job.
