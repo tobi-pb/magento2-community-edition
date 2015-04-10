@@ -12,11 +12,14 @@ namespace Magento\Update\Queue\JobUpdate;
 class ComposerManager
 {
     /**#@+
-     * Composer commands
+     * Composer command
      */
     const COMPOSER_UPDATE = 'update';
     const COMPOSER_REQUIRE = 'require';
     /**#@-*/
+
+    const PACKAGE_NAME = 'name';
+    const PACKAGE_VERSION = 'version';
 
     /** @var string */
     protected $composerConfigFileDir;
@@ -32,7 +35,7 @@ class ComposerManager
     }
 
     /**
-     * Update the data of the directive in composer config file
+     * Update composer config file using provided directive
      *
      * @param string $directive
      * @param array $params
@@ -46,7 +49,7 @@ class ComposerManager
         }
         $directiveHandler = sprintf('update%sDirective', $camelCaseDirective);
         if (!method_exists($this, $directiveHandler)) {
-            throw new \RuntimeException(sprintf('Application does not support composer\'s directive "%s"', $directive));
+            throw new \LogicException(sprintf('Composer\'s directive "%s" is not supported', $directive));
         }
         return call_user_func([$this, $directiveHandler], $params);
     }
@@ -55,7 +58,7 @@ class ComposerManager
      * Run "composer update"
      *
      * @return bool
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     public function runUpdate()
     {
@@ -73,10 +76,10 @@ class ComposerManager
     {
         $commandParams = '';
         foreach ($params as $param) {
-            if (!isset($param['name']) || !isset($param['version'])) {
-                throw new \RuntimeException('Incorrect/missed parameters for composer\'s directive "require"');
+            if (!isset($param[self::PACKAGE_NAME]) || !isset($param[self::PACKAGE_VERSION])) {
+                throw new \RuntimeException('Incorrect/missing parameters for composer\'s directive "require"');
             }
-            $commandParams .= $param['name'] . ':' . $param['version'] . ' ';
+            $commandParams .= $param[self::PACKAGE_NAME] . ':' . $param[self::PACKAGE_VERSION] . ' ';
         }
         $commandParams .= ' --no-update';
         return $this->runComposerCommand(self::COMPOSER_REQUIRE, $commandParams);
@@ -92,12 +95,18 @@ class ComposerManager
      */
     protected function runComposerCommand($command, $commandParams = null)
     {
-        $fullCommand = sprintf('cd %s && composer %s %s', $this->composerConfigFileDir, $command, $commandParams);
+        $fullCommand = sprintf(
+            'cd %s &&  php -f %s/vendor/composer/composer/bin/composer %s %s',
+            $this->composerConfigFileDir,
+            UPDATER_BP,
+            $command,
+            $commandParams
+        );
 
         exec($fullCommand, $output, $return);
 
         if ($return) {
-            throw new \RuntimeException(sprintf('Command "composer %s" failed: %s', join(' ', $output), $command));
+            throw new \RuntimeException(sprintf('Command "%s" failed: %s', $fullCommand, join("\n", $output)));
         }
         return true;
     }

@@ -11,6 +11,9 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
     protected $composerConfigFileDir;
 
     /** @var string */
+    protected $composerConfigFilePath;
+
+    /** @var string */
     protected $expectedRequireDirectiveParam;
 
     /** @var string */
@@ -19,18 +22,19 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->composerConfigFileDir = realpath(__DIR__ . '/../../_files');
+        $this->composerConfigFileDir = TESTS_TEMP_DIR;
+        $this->composerConfigFilePath = $this->composerConfigFileDir . '/composer.json';
+        copy(__DIR__ . '/../../_files/composer.json', $this->composerConfigFilePath);
         $this->expectedRequireDirectiveParam = [
             ["name" => "php", "version" => "~5.6.0"],
             ["name" => "composer/composer", "version" => "1.0.0-alpha8"]
         ];
-        $this->composerContent = file_get_contents($this->composerConfigFileDir . '/composer.json');
     }
 
     protected function tearDown()
     {
         parent::tearDown();
-        file_put_contents($this->composerConfigFileDir . '/composer.json', $this->composerContent);
+        unlink($this->composerConfigFilePath);
     }
 
     public function testUpdateComposerConfigFile()
@@ -38,17 +42,13 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
         $composerManager = new ComposerManager($this->composerConfigFileDir);
         $composerManager->updateComposerConfigFile('require', $this->expectedRequireDirectiveParam);
         $expectedRequireDirective = ["php" => "~5.6.0", "composer/composer" => "1.0.0-alpha8"];
-        $actualRequireDirective = json_decode(
-            file_get_contents($this->composerConfigFileDir . '/composer.json'),
-            true
-        )['require'];
-
+        $actualRequireDirective = json_decode(file_get_contents($this->composerConfigFilePath), true)['require'];
         $this->assertEquals($expectedRequireDirective, $actualRequireDirective );
     }
 
     /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage  Application does not support composer's directive "nonSupport"
+     * @expectedException \LogicException
+     * @expectedExceptionMessage  Composer's directive "nonSupport" is not supported
      */
     public function testUpdateComposerConfigFileNonSupportedDirective()
     {
@@ -58,7 +58,7 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage  Incorrect/missed parameters for composer's directive "require"
+     * @expectedExceptionMessage  Incorrect/missing parameters for composer's directive "require"
      */
     public function testUpdateComposerConfigFileMissedParam()
     {
