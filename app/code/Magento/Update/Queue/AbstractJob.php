@@ -27,7 +27,7 @@ abstract class AbstractJob
     /**
      * @var Status
      */
-    protected $jobStatus;
+    protected $status;
     
     /**
      * @var MaintenanceMode
@@ -46,7 +46,7 @@ abstract class AbstractJob
     {
         $this->name = $name;
         $this->params = $params;
-        $this->jobStatus = $status ? $status : new Status();
+        $this->status = $status ? $status : new Status();
         $this->maintenanceMode = $maintenanceMode ? $maintenanceMode : new MaintenanceMode();
     }
 
