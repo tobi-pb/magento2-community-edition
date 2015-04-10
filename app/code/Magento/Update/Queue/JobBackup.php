@@ -6,15 +6,17 @@
 
 namespace Magento\Update\Queue;
 
+use Magento\Update\Backup;
 use Magento\Update\Backup\BackupInfo;
-use \Magento\Update\Backup;
+use Magento\Update\Status;
+use Magento\Update\MaintenanceMode;
 
 /**
  * Magento updater application 'backup' job.
  */
 class JobBackup extends AbstractJob
 {
-    /** @var \Magento\Update\Backup\BackupInfo */
+    /** @var BackupInfo */
     protected $backupInfo;
 
     /**
@@ -22,12 +24,18 @@ class JobBackup extends AbstractJob
      *
      * @param string $name
      * @param array $params
-     * @param \Magento\Update\Status|null $status
-     * @param \Magento\Update\Backup\BackupInfo|null $backupInfo
+     * @param Status|null $status
+     * @param MaintenanceMode|null $maintenanceMode
+     * @param BackupInfo|null $backupInfo
      */
-    public function __construct($name, array $params, \Magento\Update\Status $status = null, $backupInfo = null)
-    {
-        parent::__construct($name, $params, $status);
+    public function __construct(
+        $name,
+        array $params,
+        Status $status = null,
+        MaintenanceMode $maintenanceMode = null,
+        $backupInfo = null
+    ) {
+        parent::__construct($name, $params, $status, $maintenanceMode);
         $backupInfo = $backupInfo ? $backupInfo : new BackupInfo();
         $this->backup = new Backup($backupInfo);
     }

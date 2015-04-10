@@ -6,7 +6,7 @@
 
 namespace Magento\Update\Queue;
 
-use \Magento\Update\Rollback;
+use Magento\Update\Rollback;
 
 /**
  * Magento updater application 'rollback' job.
@@ -21,10 +21,12 @@ class JobRollback extends AbstractJob
     public function execute()
     {
         if (!isset($this->params[self::BACKUP_FILE_NAME])) {
-            throw new \Exception ('Missing required parameter: ' . self::BACKUP_FILE_NAME);
+            throw new \RuntimeException('Missing required parameter: ' . self::BACKUP_FILE_NAME);
         }
         $rollBack = new Rollback();
+        $this->maintenanceMode->set(true);
         $rollBack->execute($this->params[self::BACKUP_FILE_NAME]);
+        $this->maintenanceMode->set(false);
         return $this;
     }
 }

@@ -7,6 +7,30 @@ namespace Magento\Update\Queue;
 
 class JobRollbackTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var string */
+    protected $maintenanceFlagFilePath;
+
+    /** @var string */
+    protected $updateErrorFlagFilePath;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->maintenanceFlagFilePath = TESTS_TEMP_DIR . '/.maintenance.flag';
+        $this->updateErrorFlagFilePath = TESTS_TEMP_DIR . '/.update_error.flag';
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        if (file_exists($this->maintenanceFlagFilePath)) {
+            unlink($this->maintenanceFlagFilePath);
+        }
+        if (file_exists($this->updateErrorFlagFilePath)) {
+            unlink($this->updateErrorFlagFilePath);
+        }
+    }
+
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage Missing required parameter: backup_file_name
@@ -23,9 +47,15 @@ class JobRollbackTest extends \PHPUnit_Framework_TestCase
     public function testManualRollbackBackupFileUnavailable()
     {
         $backupFileName = UPDATER_BP . '/dev/tests/integration/testsuite/Magento/Update/_files/backup/' . 'fake.zip';
+        $maintenanceMode = new \Magento\Update\MaintenanceMode(
+            $this->maintenanceFlagFilePath,
+            $this->updateErrorFlagFilePath
+        );
         $jobRollback = new \Magento\Update\Queue\JobRollback(
             'rollback',
-            ['backup_file_name' => $backupFileName]
+            ['backup_file_name' => $backupFileName],
+            new \Magento\Update\Status(),
+            $maintenanceMode
         );
         $this->setExpectedException('RuntimeException', sprintf('"%s" backup file does not exist.', $backupFileName));
         $jobRollback->execute();

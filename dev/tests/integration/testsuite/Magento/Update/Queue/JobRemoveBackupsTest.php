@@ -5,6 +5,8 @@
  */
 namespace Magento\Update\Queue;
 
+use Magento\Update\Status;
+
 class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \Magento\Update\Queue\JobRemoveBackups */
@@ -29,6 +31,9 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
     protected $maintenanceFlagFilePath;
 
     /** @var string */
+    protected $maintenanceAddressFlag;
+
+    /** @var string */
     protected $updateErrorFlagFilePath;
 
     protected function setUp()
@@ -41,8 +46,9 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         if (!is_dir($this->backupPath)) {
             mkdir($this->backupPath);
         }
-        $this->maintenanceFlagFilePath = UPDATER_BP . '/var/.maintenance.flag';
-        $this->updateErrorFlagFilePath = UPDATER_BP . '/var/.update_error.flag';
+        $this->maintenanceFlagFilePath = TESTS_TEMP_DIR . '/.maintenance.flag';
+        $this->maintenanceAddressFlag = $this->maintenanceAddressFlag;
+        $this->updateErrorFlagFilePath = TESTS_TEMP_DIR . '/.update_error.flag';
     }
 
     protected function tearDown()
@@ -110,9 +116,15 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteInvalidBackupFile()
     {
+        $maintenanceMode = new \Magento\Update\MaintenanceMode(
+            $this->maintenanceFlagFilePath,
+            $this->maintenanceAddressFlag
+        );
         $this->jobRemoveBackup = new \Magento\Update\Queue\JobRemoveBackups(
             'remove_backups',
-            ['backups_file_names' => [$this->backupPath . 'no-such-file.zip']]
+            ['backups_file_names' => [$this->backupPath . 'no-such-file.zip']],
+            new Status(),
+            $maintenanceMode
         );
         $this->jobRemoveBackup->execute();
     }
@@ -122,9 +134,15 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         if (!file_exists($this->backupPath . $this->backupFilenameA)) {
             file_put_contents($this->backupPath . $this->backupFilenameA, '');
         }
+        $maintenanceMode = new \Magento\Update\MaintenanceMode(
+            $this->maintenanceFlagFilePath,
+            $this->maintenanceAddressFlag
+        );
         $this->jobRemoveBackup = new \Magento\Update\Queue\JobRemoveBackups(
             'remove_backups',
-            ['backups_file_names' => [$this->backupPath . $this->backupFilenameA]]
+            ['backups_file_names' => [$this->backupPath . $this->backupFilenameA]],
+            new \Magento\Update\Status(),
+            $maintenanceMode
         );
         $this->jobRemoveBackup->execute();
         $this->assertFalse(file_exists($this->backupPath . $this->backupFilenameA));
@@ -141,6 +159,10 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         if (!file_exists($this->backupPath . $this->backupFilenameC)) {
             file_put_contents($this->backupPath . $this->backupFilenameC, '');
         }
+        $maintenanceMode = new \Magento\Update\MaintenanceMode(
+            $this->maintenanceFlagFilePath,
+            $this->maintenanceAddressFlag
+        );
         $this->jobRemoveBackup = new \Magento\Update\Queue\JobRemoveBackups(
             'remove_backups',
             [
@@ -148,7 +170,9 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
                     $this->backupPath . $this->backupFilenameA,
                     $this->backupPath . $this->backupFilenameB
                 ]
-            ]
+            ],
+            new \Magento\Update\Status(),
+            $maintenanceMode
         );
         $this->jobRemoveBackup->execute();
         $this->assertFalse(file_exists($this->backupPath . $this->backupFilenameA));

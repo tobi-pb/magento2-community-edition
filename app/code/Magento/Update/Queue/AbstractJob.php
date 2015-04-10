@@ -6,7 +6,8 @@
 
 namespace Magento\Update\Queue;
 
-use \Magento\Update\Status;
+use Magento\Update\Status;
+use Magento\Update\MaintenanceMode;
 
 /**
  * Magento updater application abstract job.
@@ -24,22 +25,29 @@ abstract class AbstractJob
     protected $params;
 
     /**
-     * @var \Magento\Update\Status
+     * @var Status
      */
-    protected $status;
+    protected $jobStatus;
+    
+    /**
+     * @var MaintenanceMode
+     */
+    protected $maintenanceMode;
 
     /**
      * Initialize job instance.
      *
      * @param string $name
      * @param array $params
-     * @param \Magento\Update\Status|null $status
+     * @param Status|null $status
+     * @param MaintenanceMode|null $maintenanceMode
      */
-    public function __construct($name, array $params, \Magento\Update\Status $status = null)
+    public function __construct($name, array $params, Status $status = null, MaintenanceMode $maintenanceMode = null)
     {
         $this->name = $name;
         $this->params = $params;
-        $this->status = $status ? $status : new Status();
+        $this->jobStatus = $status ? $status : new Status();
+        $this->maintenanceMode = $maintenanceMode ? $maintenanceMode : new MaintenanceMode();
     }
 
     /**

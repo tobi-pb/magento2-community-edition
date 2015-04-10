@@ -6,37 +6,12 @@
 
 namespace Magento\Update\Queue;
 
-use Magento\Update\MaintenanceMode;
-
 /**
  * Magento updater application 'remove_backups' job.
  */
 class JobRemoveBackups extends AbstractJob
 {
     const BACKUPS_FILE_NAMES = 'backups_file_names';
-
-    /**
-     * @var MaintenanceMode
-     */
-    protected $maintenanceMode;
-
-    /**
-     * Initialize job instance.
-     *
-     * @param string $name
-     * @param array $params
-     * @param \Magento\Update\Status|null $status
-     * @param MaintenanceMode|null $maintenanceMode
-     */
-    public function __construct(
-        $name,
-        array $params,
-        \Magento\Update\Status $status = null,
-        MaintenanceMode $maintenanceMode = null
-    ) {
-        parent::__construct($name, $params, $status);
-        $this->maintenanceMode = $maintenanceMode ? $maintenanceMode : new MaintenanceMode();
-    }
     
     /**
      * {@inheritdoc}

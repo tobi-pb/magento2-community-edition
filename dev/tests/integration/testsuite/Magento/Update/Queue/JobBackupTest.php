@@ -5,6 +5,8 @@
  */
 namespace Magento\Update\Queue;
 
+use Magento\Update\MaintenanceMode;
+
 class JobBackupTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  string */
@@ -30,6 +32,12 @@ class JobBackupTest extends \PHPUnit_Framework_TestCase
     {
         if (is_dir($this->backupPath)) {
             rmdir($this->backupPath);
+        }
+        if (file_exists(TESTS_TEMP_DIR . '/maintenanceMode.flag')) {
+            unlink(TESTS_TEMP_DIR . '/maintenanceMode.flag');
+        }
+        if (file_exists(TESTS_TEMP_DIR . '/maintenanceAddress.flag')) {
+            unlink(TESTS_TEMP_DIR . '/maintenanceAddress.flag');
         }
         parent::tearDown();
     }
@@ -59,7 +67,11 @@ class JobBackupTest extends \PHPUnit_Framework_TestCase
             ->method('getBackupPath')
             ->willReturn($this->backupPath);
 
-        $jobBackup = new \Magento\Update\Queue\JobBackup($jobName, [], $jobStatus, $backupInfo);
+        $maintenanceMode = new MaintenanceMode(
+            TESTS_TEMP_DIR . '/maintenanceMode.flag',
+            TESTS_TEMP_DIR . '/maintenanceAddress.flag'
+        );
+        $jobBackup = new \Magento\Update\Queue\JobBackup($jobName, [], $jobStatus, $maintenanceMode, $backupInfo);
         $this->dirList = scandir($this->backupPath);
 
         $jobBackup->execute();
