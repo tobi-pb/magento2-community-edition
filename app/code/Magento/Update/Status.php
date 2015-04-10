@@ -65,7 +65,7 @@ class Status
             : UPDATER_BP . '/var/.update_in_progress.flag';
         $this->updateErrorFlagFilePath = $updateErrorFlagFilePath
             ? $updateErrorFlagFilePath
-            : UPDATER_BP . '/var/.update_error.flag';
+            : MAGENTO_BP . '/var/.update_error.flag';
     }
 
     /**

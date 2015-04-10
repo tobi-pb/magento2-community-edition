@@ -14,10 +14,21 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
     protected $backupFilename;
 
     /** @var string */
+    protected $backupFilenameA;
+
+    /** @var string */
+    protected $backupFilenameB;
+
+    /** @var string */
+    protected $backupFilenameC;
+
+    /** @var string */
     protected $backupPath;
 
+    /** @var string */
     protected $maintenanceFlagFilePath;
 
+    /** @var string */
     protected $updateErrorFlagFilePath;
 
     protected function setUp()
@@ -26,7 +37,10 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         $this->backupFilenameA = uniqid('test_backupA') . '.zip';
         $this->backupFilenameB = uniqid('test_backupB') . '.zip';
         $this->backupFilenameC = uniqid('test_backupC') . '.zip';
-        $this->backupPath = UPDATER_BP . '/var/backup/';
+        $this->backupPath = TESTS_TEMP_DIR . '/backup/';
+        if (!is_dir($this->backupPath)) {
+            mkdir($this->backupPath);
+        }
         $this->maintenanceFlagFilePath = UPDATER_BP . '/var/.maintenance.flag';
         $this->updateErrorFlagFilePath = UPDATER_BP . '/var/.update_error.flag';
     }
@@ -43,6 +57,9 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
         if (file_exists($this->backupPath . $this->backupFilenameC)) {
             unlink($this->backupPath . $this->backupFilenameC);
         }
+        if (is_dir($this->backupPath)) {
+            rmdir($this->backupPath);
+        }
         if (file_exists($this->maintenanceFlagFilePath)) {
             unlink($this->maintenanceFlagFilePath);
         }
@@ -52,26 +69,38 @@ class JobRemoveBackupsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param bool $isMaintenanceModeOn
+     * @param bool $isUpdaterError
      * @dataProvider flagFileDataProvider
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Cannot remove backup archives while setup is in progress.
      */
-    public function testExecuteFlag($flag)
+    public function testExecuteFlag($isMaintenanceModeOn, $isUpdaterError)
     {
-        if (!file_exists($flag)) {
-            file_put_contents($flag, '');
-        }
+        /** @var \Magento\Update\Queue\MaintenanceMode $maintenanceModeMock */
+        $maintenanceModeMock = $this->getMockBuilder('Magento\Update\Queue\MaintenanceMode')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $maintenanceModeMock->expects($this->any())->method('isOn')->willReturn($isMaintenanceModeOn);
+        /** @var \Magento\Update\Status $statusMock */
+        $statusMock = $this->getMockBuilder('Magento\Update\Status')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $statusMock->expects($this->any())->method('isUpdateError')->willReturn($isUpdaterError);
         $this->jobRemoveBackup = new \Magento\Update\Queue\JobRemoveBackups(
             'remove_backups',
-            [$this->backupPath . $this->backupFilenameA]
+            [$this->backupPath . $this->backupFilenameA],
+            $statusMock,
+            $maintenanceModeMock
         );
         $this->jobRemoveBackup->execute();
     }
 
-    public function flagFileDataProvider() {
+    public function flagFileDataProvider()
+    {
         return [
-            [UPDATER_BP . '/var/.maintenance.flag'],
-            [UPDATER_BP . '/var/.update_error.flag']
+            "Updater error" => [false, true],
+            "Maintenance mode on" => [true, true]
         ];
     }
 

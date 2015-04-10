@@ -37,7 +37,7 @@ class JobBackup extends AbstractJob
      */
     public function execute()
     {
-        $this->jobStatus->add(sprintf('%s: Backup %s has been created', $this->getName(), $this->backup->execute()));
+        $this->backup->execute();
         return $this;
     }
 }

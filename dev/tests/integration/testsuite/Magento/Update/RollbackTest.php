@@ -38,11 +38,18 @@ class RollbackTest extends \PHPUnit_Framework_TestCase
         $this->backupPath = UPDATER_BP . '/dev/tests/integration/testsuite/Magento/Update/_files/backup/';
         $this->archivedDir = UPDATER_BP . '/dev/tests/integration/testsuite/Magento/Update/_files/archived/';
         $this->excludedDir = UPDATER_BP . '/dev/tests/integration/testsuite/Magento/Update/_files/archived/excluded/';
-        mkdir($this->backupPath);
-        mkdir($this->archivedDir);
-        mkdir($this->excludedDir);
+
+        if (!is_dir($this->backupPath)) {
+            mkdir($this->backupPath);
+        }
+        if (!is_dir($this->archivedDir)) {
+            mkdir($this->archivedDir);
+        }
+        if (!is_dir($this->excludedDir)) {
+            mkdir($this->excludedDir);
+        }
         $this->backupFileName = uniqid('test_backup') . '.zip';
-        $this->rollBack = new \Magento\Update\Rollback($this->backupPath);
+        $this->rollBack = new \Magento\Update\Rollback($this->backupPath, $this->archivedDir);
     }
 
     protected function tearDown()
@@ -64,7 +71,7 @@ class RollbackTest extends \PHPUnit_Framework_TestCase
      */
     public function testAutoRollbackBackupFileUnavailable()
     {
-        $this->rollBack->autoRollback();
+        $this->rollBack->execute();
     }
 
     public function testAutoRollback()
@@ -89,16 +96,24 @@ class RollbackTest extends \PHPUnit_Framework_TestCase
             ->method('getBlacklist')
             ->willReturn([$this->excludedDir]);
 
-        $archivator = new \Magento\Update\Backup\UnixZipArchive($backupInfo);
-        $result = $archivator->archive();
-        $this->assertEquals($this->backupFileName, $result);
+        $statusMock = $this->getMockBuilder('Magento\Update\Status')->disableOriginalConstructor()->getMock();
+        $backup = new \Magento\Update\Backup($backupInfo, $statusMock);
+        $backupFilePath = $this->backupPath . $this->backupFileName;
+        $statusMock->expects($this->at(0))->method('add')->with(
+            sprintf('Creating backup archive "%s" ...', $backupFilePath)
+        );
+        $statusMock->expects($this->at(1))->method('add')->with(
+            sprintf('Backup archive "%s" has been created.', $backupFilePath)
+        );
+        $result = $backup->execute();
+        $this->assertInstanceOf('Magento\Update\Backup', $result);
 
         // Change the contents of a.txt
         $this->autoRollbackHelper(1);
         $this->assertEquals('foo changed', file_get_contents($this->archivedDir . 'a.txt'));
 
         // Rollback process
-        $this->rollBack->autoRollback();
+        $this->rollBack->execute();
 
         // Assert that the contents of a.txt has been restored properly
         $this->assertEquals('foo', file_get_contents($this->archivedDir . 'a.txt'));

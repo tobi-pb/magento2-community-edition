@@ -30,8 +30,8 @@ class MaintenanceMode
      */
     public function __construct($flagFile = null, $ipFile = null)
     {
-        $this->flagFile = $flagFile ? $flagFile : UPDATER_BP . '/var/.maintenance.flag';
-        $this->ipFile = $ipFile ? $ipFile : UPDATER_BP . '/var/.maintenance.ip';
+        $this->flagFile = $flagFile ? $flagFile : MAGENTO_BP . '/var/.maintenance.flag';
+        $this->ipFile = $ipFile ? $ipFile : MAGENTO_BP . '/var/.maintenance.ip';
     }
 
     /**

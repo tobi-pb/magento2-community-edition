@@ -20,10 +20,6 @@ class JobRollbackTest extends \PHPUnit_Framework_TestCase
         $jobRollback->execute();
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage The backup file specified by update_queue.json does not exist.
-     */
     public function testManualRollbackBackupFileUnavailable()
     {
         $backupFileName = UPDATER_BP . '/dev/tests/integration/testsuite/Magento/Update/_files/backup/' . 'fake.zip';
@@ -31,6 +27,7 @@ class JobRollbackTest extends \PHPUnit_Framework_TestCase
             'rollback',
             ['backup_file_name' => $backupFileName]
         );
+        $this->setExpectedException('RuntimeException', sprintf('"%s" backup file does not exist.', $backupFileName));
         $jobRollback->execute();
     }
 }

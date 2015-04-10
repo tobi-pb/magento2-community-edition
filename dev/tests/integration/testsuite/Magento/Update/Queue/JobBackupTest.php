@@ -20,7 +20,18 @@ class JobBackupTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->backupFilename = uniqid('test_backup') . '.zip';
-        $this->backupPath = UPDATER_BP . '/var/backup/';
+        $this->backupPath = TESTS_TEMP_DIR . '/backup/';
+        if (!is_dir($this->backupPath)) {
+            mkdir($this->backupPath);
+        }
+    }
+
+    protected function tearDown()
+    {
+        if (is_dir($this->backupPath)) {
+            rmdir($this->backupPath);
+        }
+        parent::tearDown();
     }
 
     public function testArchive()
@@ -34,7 +45,6 @@ class JobBackupTest extends \PHPUnit_Framework_TestCase
 
         $backupInfo = $this->getMockBuilder('Magento\Update\Backup\BackupInfo')
             ->disableOriginalConstructor()
-            ->setMethods(['generateBackupFilename', 'getBlacklist', 'getArchivedDirectory'])
             ->getMock();
         $backupInfo->expects($this->any())
             ->method('generateBackupFilename')
@@ -45,6 +55,9 @@ class JobBackupTest extends \PHPUnit_Framework_TestCase
         $backupInfo->expects($this->any())
             ->method('getBlacklist')
             ->willReturn(['/var/backup', '/vendor', '/app/code']);
+        $backupInfo->expects($this->any())
+            ->method('getBackupPath')
+            ->willReturn($this->backupPath);
 
         $jobBackup = new \Magento\Update\Queue\JobBackup($jobName, [], $jobStatus, $backupInfo);
         $this->dirList = scandir($this->backupPath);
@@ -56,8 +69,9 @@ class JobBackupTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->backupFilename, $actualBackupFile);
 
         $actualJobStatus = $jobStatus->get();
-        $expectedJobStatus = $jobName . ': Backup ' . $actualBackupFile . ' has been created';
-        $this->assertRegExp('/' . $expectedJobStatus . '/', $actualJobStatus);
+        $fullBackupFileName = $this->backupPath . $this->backupFilename;
+        $this->assertContains(sprintf('Creating backup archive "%s" ...', $fullBackupFileName), $actualJobStatus);
+        $this->assertContains(sprintf('Backup archive "%s" has been created.', $fullBackupFileName), $actualJobStatus);
 
         if (file_exists($this->backupPath . $actualBackupFile)) {
             unlink($this->backupPath . $actualBackupFile);

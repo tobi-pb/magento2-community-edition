@@ -6,48 +6,73 @@
 
 namespace Magento\Update;
 
-use Magento\Update\Backup\UnixZipArchive;
 use Magento\Update\Backup\BackupInfo;
+use Magento\Update\Status;
 
 /**
- * Class Backup
+ * Class for creating Magento codebase backups.
  */
 class Backup
 {
-    /** @var \Magento\Update\Backup\ArchiveInterface */
-    protected $archivator;
+    /**
+     * @var BackupInfo
+     */
+    protected $backupInfo;
 
     /**
-     *
-     * @param \Magento\Update\Backup\BackupInfo|null $backupInfo
-     * @param \Magento\Update\Backup\ArchiveInterface|null $archivator
+     * @var Status
      */
-    public function __construct(
-        \Magento\Update\Backup\BackupInfo $backupInfo = null,
-        \Magento\Update\Backup\ArchiveInterface $archivator = null
-    ) {
-        $backupInfo = $backupInfo ? $backupInfo : new BackupInfo();
-        $this->archivator = $archivator ? $archivator : $this->createArchivator($backupInfo);
+    protected $status;
+
+    /**
+     * Initialize dependencies.
+     *
+     * @param BackupInfo|null $backupInfo
+     * @param Status|null $status
+     */
+    public function __construct(BackupInfo $backupInfo = null, Status $status = null)
+    {
+        $this->backupInfo = $backupInfo ? $backupInfo : new BackupInfo();
+        $this->status = $status ? $status : new Status();
     }
 
     /**
-     * Run backup process
+     * Create backup archive using unix zip tool.
      *
-     * @throws \Exception
+     * @return $this
+     * @throws \RuntimeException
      */
     public function execute()
     {
-        return $this->archivator->archive();
+        $backupFilePath = $this->backupInfo->getBackupPath() . $this->backupInfo->generateBackupFilename();
+        $command = $this->buildShellCommand($backupFilePath);
+        $this->status->add(sprintf('Creating backup archive "%s" ...', $backupFilePath));
+        exec($command, $output, $return);
+        if ($return) {
+            throw new \RuntimeException(
+                sprintf('Cannot create backup with command "%s": %s', $command, implode("\n", $output))
+            );
+        }
+        $this->status->add(sprintf('Backup archive "%s" has been created.', $backupFilePath));
+        return $this;
     }
 
     /**
-     * Return concrete archivator
+     * Construct shell command for creating backup archive.
      *
-     * @param \Magento\Update\Backup\BackupInfo $backupInfo
-     * @return \Magento\Update\Backup\ArchiveInterface
+     * @param string $backupFilePath
+     * @return string
      */
-    protected function createArchivator($backupInfo)
+    protected function buildShellCommand($backupFilePath)
     {
-        return new UnixZipArchive($backupInfo);
+        $excludedElements = '';
+        foreach ($this->backupInfo->getBlacklist() as $excludedElement) {
+            $elementPath = $excludedElement;
+            $fullPath = $this->backupInfo->getArchivedDirectory() . $elementPath;
+            $excludedElements .= is_dir($fullPath) ? $elementPath . '\* ' : $elementPath . ' ';
+        }
+        $changeDirectoryCommand = sprintf("cd %s", $this->backupInfo->getArchivedDirectory());
+        $zipCommand = sprintf("zip -r %s . -x %s", $backupFilePath, $excludedElements);
+        return $changeDirectoryCommand . ' && ' . $zipCommand;
     }
 }

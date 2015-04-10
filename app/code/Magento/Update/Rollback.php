@@ -6,6 +6,8 @@
 
 namespace Magento\Update;
 
+use Magento\Update\Status;
+
 /**
  * Class for rollback capabilities
  */
@@ -17,54 +19,59 @@ class Rollback
     protected $backupFileDir;
 
     /**
+     * @var string
+     */
+    protected $restoreTargetDir;
+
+    /**
+     * @var string
+     */
+    protected $status;
+
+    /**
      * Initialize rollback.
      *
      * @param string|null $backupFileDir
+     * @param string|null $restoreTargetDir
+     * @param Status|null $status
      */
-    public function __construct($backupFileDir = null)
+    public function __construct($backupFileDir = null, $restoreTargetDir = null, Status $status = null)
     {
         $this->backupFileDir = $backupFileDir ? $backupFileDir : UPDATER_BACKUP_DIR;
+        $this->restoreTargetDir = $restoreTargetDir ? $restoreTargetDir : MAGENTO_BP;
+        $this->status = $status ? $status : new Status();
     }
 
     /**
-     * Rollback to an archive version using the backup file path specified by update_queue.json
+     * Restore Magento code from the backup archive.
      *
-     * @param string $backupFilePath
-     * @throws \Exception
-     * @return bool
+     * Rollback to the code version stored in the specified backup archive.
+     * If no archive specified, use the the most recent one.
+     *
+     * @param string|null $backupFilePath
+     * @throws \RuntimeException
+     * @return $this
      */
-    public function manualRollback($backupFilePath)
+    public function execute($backupFilePath = null)
     {
-        if (!file_exists($backupFilePath)) {
-            throw new \Exception ("The backup file specified by update_queue.json does not exist.");
+        if (null === $backupFilePath) {
+            $backupFilePath = $this->getLastBackupFilePath();
         }
-        echo "Restoring archive from $backupFilePath ...";
-        $this->rollbackHelper($backupFilePath);
-
-        return true;
+        if (!file_exists($backupFilePath)) {
+            throw new \RuntimeException(sprintf('"%s" backup file does not exist.', $backupFilePath));
+        }
+        $this->status->add(sprintf('Restoring archive from "%s" ...', $backupFilePath));
+        $this->unzipArchive($backupFilePath);
+        return $this;
     }
 
     /**
-     * Automatic rollback when any error happens during update process
+     * Find the last backup file from backup directory.
      *
-     * @return bool
-     */
-    public function autoRollback()
-    {
-        $backupFileName = $this->getLastBackupFile();
-        $backupFilePath = $this->backupFileDir . $backupFileName;
-        $this->rollbackHelper($backupFilePath);
-
-        return true;
-    }
-
-    /**
-     * Find the last backup file from backup directory
-     *
-     * @throws \Exception
+     * @throws \RuntimeException
      * @return string
      */
-    protected function getLastBackupFile()
+    protected function getLastBackupFilePath()
     {
         $allFileList = scandir($this->backupFileDir, SCANDIR_SORT_DESCENDING);
         $backupFileName = '';
@@ -77,26 +84,28 @@ class Rollback
         }
 
         if (empty($backupFileName)) {
-            throw new \Exception ("No available backup file found.");
+            throw new \RuntimeException("No available backup file found.");
         }
-        return $backupFileName;
+        return $this->backupFileDir . $backupFileName;
     }
 
     /**
-     * Rollback
+     * Unzip specified archive
      *
      * @param string $backupFilePath
-     * @throws \Exception
-     * @return void
+     * @throws \RuntimeException
+     * @return $this
      */
-    protected function rollbackHelper($backupFilePath)
+    protected function unzipArchive($backupFilePath)
     {
-        exec('unzip -o ' . $backupFilePath . ' -d ' . '/', $output, $return);
+        $command = sprintf('unzip -o %s -d %s', $backupFilePath, $this->restoreTargetDir);
+        exec($command, $output, $return);
         if ($return) {
-            throw new \Exception("Rollback was not successful.");
+            throw new \RuntimeException(
+                sprintf('Error happened during execution of command "%s": %s', $command, implode("\n", $output))
+            );
         }
-        foreach ($output as $message) {
-            printf("$message\n");
-        }
+        $this->status->add('Backup of Magento code was successfully created: "%s"', $backupFilePath);
+        return $this;
     }
 }
