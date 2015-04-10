@@ -2,7 +2,7 @@
     "name": "magento/product-community-edition",
     "description": "eCommerce Platform for Growth (Community Edition)",
     "type": "project",
-    "version": "0.74.0-beta3",
+    "version": "0.74.0-beta4",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
@@ -35,6 +35,7 @@
         "oyejorge/less.php": "1.7.0.3",
         "tubalmartin/cssmin": "2.4.8-p4",
         "magento/magento-composer-installer": "*",
+        "symfony/console": "~2.3",
         "magento/magento2-base": "self.version",
         "magento/module-admin-notification": "self.version",
         "magento/module-authorization": "self.version",
@@ -101,6 +102,7 @@
         "magento/module-rule": "self.version",
         "magento/module-sales": "self.version",
         "magento/module-sales-rule": "self.version",
+        "magento/module-sales-sequence": "self.version",
         "magento/module-search": "self.version",
         "magento/module-sendfriend": "self.version",
         "magento/module-shipping": "self.version",
