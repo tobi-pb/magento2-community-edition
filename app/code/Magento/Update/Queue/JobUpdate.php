@@ -82,7 +82,6 @@ class JobUpdate extends AbstractJob
             }
             throw new \RuntimeException(sprintf('Could not complete %s successfully: %s', $this, $e->getMessage()));
         }
-        $this->status->add('Flushing cache...');
         $this->flushMagentoCache();
         return $this;
     }
@@ -95,14 +94,21 @@ class JobUpdate extends AbstractJob
         $cacheDirs = [MAGENTO_BP . '/var', MAGENTO_BP . '/pub/static'];
         $blacklist = ['.', '..', '.htaccess'];
 
+        $this->status->add('Flushing cache:');
         foreach ($cacheDirs as $cacheDir) {
             $elementsToRemove[] = array_diff(scandir($cacheDir), $blacklist);
             foreach ($elementsToRemove as $element) {
                 $path = $cacheDir . '/' . $element;
+                $this->status->add($path);
                 if (is_dir($path)) {
-                    exec('rm -rf ' . $path);
+                    exec('rm -rf ' . $path, $output, $return);
+                    if ($return) {
+                        $this->status->add(sprintf('Could not delete "%s", try to do it manually', $path));
+                    }
                 } else if (is_file($path)) {
-                    unlink($path);
+                    if (!unlink($path)) {
+                        $this->status->add(sprintf('Could not delete "%s", try to do it manually', $path));
+                    }
                 }
             }
         }
