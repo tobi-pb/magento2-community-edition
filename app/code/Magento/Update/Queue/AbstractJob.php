@@ -35,7 +35,7 @@ abstract class AbstractJob
      * @param array $params
      * @param \Magento\Update\Status|null $jobStatus
      */
-    public function __construct($name, $params, \Magento\Update\Status $jobStatus = null)
+    public function __construct($name, array $params, \Magento\Update\Status $jobStatus = null)
     {
         $this->name = $name;
         $this->params = $params;

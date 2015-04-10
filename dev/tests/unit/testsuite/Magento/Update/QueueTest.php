@@ -43,7 +43,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
         $this->jobFactoryMock->expects($this->exactly(4))->method('create')->willReturn($jobMock);
         /** Ensure that arguments are passed correctly to the job factory */
-        $this->jobFactoryMock->expects($this->at(0))->method('create')->with('backup', (object)[]);
+        $this->jobFactoryMock->expects($this->at(0))->method('create')->with('backup', []);
         $this->queueReaderMock->expects($this->once())->method('clearQueue');
         $jobs = $this->queue->popQueuedJobs();
         $this->assertCount(4, $jobs);
@@ -80,7 +80,7 @@ class QueueTest extends \PHPUnit_Framework_TestCase
 
             ],
             'Incorrect format of "jobs" field' => [
-                '{"jobs": {}}',
+                '{"jobs": "string_value"}',
                 '"jobs" field is missing or is not an array.'
 
             ],

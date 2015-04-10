@@ -21,11 +21,11 @@ class JobBackup extends AbstractJob
      * Initialize job instance.
      *
      * @param string $name
-     * @param object $params
+     * @param array $params
      * @param \Magento\Update\Status|null $jobStatus
      * @param \Magento\Update\Backup\BackupInfo|null $backupInfo
      */
-    public function __construct($name, $params, \Magento\Update\Status $jobStatus = null, $backupInfo = null)
+    public function __construct($name, array $params, \Magento\Update\Status $jobStatus = null, $backupInfo = null)
     {
         parent::__construct($name, $params, $jobStatus);
         $backupInfo = $backupInfo ? $backupInfo : new BackupInfo();

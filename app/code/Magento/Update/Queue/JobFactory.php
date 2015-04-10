@@ -28,7 +28,7 @@ class JobFactory
      * @return AbstractJob
      * @throws \RuntimeException
      */
-    public function create($name, $params)
+    public function create($name, array $params)
     {
         switch ($name) {
             case self::NAME_UPDATE:

@@ -25,7 +25,7 @@ class JobFactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreate($jobName, $expectedJobClass)
     {
-        $job = $this->jobFactory->create($jobName, (object)[]);
+        $job = $this->jobFactory->create($jobName, []);
         $this->assertInstanceOf($expectedJobClass, $job);
     }
 
@@ -46,6 +46,6 @@ class JobFactoryTest extends \PHPUnit_Framework_TestCase
             '"invalid" job is not supported. The following jobs are supported: '
             . 'update, backup, rollback, remove_backups.'
         );
-        $this->jobFactory->create('invalid', (object)[]);
+        $this->jobFactory->create('invalid', []);
     }
 }

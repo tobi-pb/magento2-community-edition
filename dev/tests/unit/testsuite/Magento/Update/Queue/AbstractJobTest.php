@@ -12,7 +12,7 @@ class AbstractJobTest extends \PHPUnit_Framework_TestCase
         /** Any implementation of abstract job can be used for __toString testing */
         $job = new \Magento\Update\Queue\JobBackup(
             'backup',
-            (object)['targetArchivePath' => '/Users/john/archive.zip', 'sourceDirectory' => '/Users/john/Magento']
+            ['targetArchivePath' => '/Users/john/archive.zip', 'sourceDirectory' => '/Users/john/Magento']
         );
         $this->assertEquals(
             '<backup>{"targetArchivePath":"\/Users\/john\/archive.zip","sourceDirectory":"\/Users\/john\/Magento"}',

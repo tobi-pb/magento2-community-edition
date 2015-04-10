@@ -24,13 +24,13 @@ class JobRemoveBackups extends AbstractJob
      * Initialize job instance.
      *
      * @param string $name
-     * @param object $params
+     * @param array $params
      * @param \Magento\Update\Status|null $jobStatus
      * @param MaintenanceMode|null $maintenanceMode
      */
     public function __construct(
         $name,
-        $params,
+        array $params,
         \Magento\Update\Status $jobStatus = null,
         MaintenanceMode $maintenanceMode = null
     ) {
