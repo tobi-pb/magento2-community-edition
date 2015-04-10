@@ -25,6 +25,9 @@ class JobBackupTest extends \PHPUnit_Framework_TestCase
 
     public function testArchive()
     {
+        if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
+            $this->markTestSkipped();
+        }
         $jobName = 'Backup';
         $jobStatus = new \Magento\Update\Status();
         $jobStatus->clear();
