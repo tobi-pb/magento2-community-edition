@@ -39,7 +39,7 @@ class BackupInfo
     public function generateBackupFilename()
     {
         $currentDate = date('Y-m-d-H-i-s', time());
-        return 'backup-' . $currentDate . '.zip';
+        return 'backup-' . $currentDate . '-' . date_default_timezone_get() . '.zip';
     }
 
     /**
