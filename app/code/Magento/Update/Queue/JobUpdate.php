@@ -33,11 +33,11 @@ class JobUpdate extends AbstractJob
      *
      * @param string $name
      * @param array $params
-     * @param \Magento\Update\Status $status
-     * @param \Magento\Update\Backup $backup
-     * @param \Magento\Update\Rollback $rollback
-     * @param \Magento\Update\Queue\JobUpdate\ComposerManager $composerManager
-     * @param \Magento\Update\MaintenanceMode $maintenanceMode
+     * @param \Magento\Update\Status|null $status
+     * @param \Magento\Update\Backup|null $backup
+     * @param \Magento\Update\Rollback|null $rollback
+     * @param \Magento\Update\Queue\JobUpdate\ComposerManager|null $composerManager
+     * @param \Magento\Update\MaintenanceMode|null $maintenanceMode
      */
     public function __construct(
         $name,
@@ -63,12 +63,14 @@ class JobUpdate extends AbstractJob
         $this->maintenanceMode->set(true);
         $this->backup->execute();
         try {
+            $this->status->add('Starting composer update...');
             foreach ($this->params as $directive => $params) {
                 $this->composerManager->updateComposerConfigFile($directive, $params);
             }
             $this->composerManager->runUpdate();
             $this->status->setUpdateError(false);
             $this->maintenanceMode->set(false);
+            $this->status->add('Composer update completed successfully');
         } catch (\Exception $e) {
             $this->status->setUpdateError(true);
             try {
@@ -80,12 +82,29 @@ class JobUpdate extends AbstractJob
             }
             throw new \RuntimeException(sprintf('Could not complete %s successfully: %s', $this, $e->getMessage()));
         }
+        $this->status->add('Flushing cache...');
         $this->flushMagentoCache();
         return $this;
     }
 
+    /**
+     * Flash filesystem caches
+     */
     protected function flushMagentoCache()
     {
-        //TODO: handle here cache flushing
+        $cacheDirs = [MAGENTO_BP . '/var', MAGENTO_BP . '/pub/static'];
+        $blacklist = ['.', '..', '.htaccess'];
+
+        foreach ($cacheDirs as $cacheDir) {
+            $elementsToRemove[] = array_diff(scandir($cacheDir), $blacklist);
+            foreach ($elementsToRemove as $element) {
+                $path = $cacheDir . '/' . $element;
+                if (is_dir($path)) {
+                    exec('rm -rf ' . $path);
+                } else if (is_file($path)) {
+                    unlink($path);
+                }
+            }
+        }
     }
 }

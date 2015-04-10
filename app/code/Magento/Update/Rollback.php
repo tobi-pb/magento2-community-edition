@@ -57,10 +57,10 @@ class Rollback
         if (null === $backupFilePath) {
             $backupFilePath = $this->getLastBackupFilePath();
         }
+        $this->status->add(sprintf('Restoring archive from "%s" ...', $backupFilePath));
         if (!file_exists($backupFilePath)) {
             throw new \RuntimeException(sprintf('"%s" backup file does not exist.', $backupFilePath));
         }
-        $this->status->add(sprintf('Restoring archive from "%s" ...', $backupFilePath));
         $this->unzipArchive($backupFilePath);
         return $this;
     }
