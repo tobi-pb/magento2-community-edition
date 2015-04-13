@@ -121,7 +121,7 @@ class ComposerManager
      */
     protected function removeReplaceDirective($packageName)
     {
-        $composerFilePath = MAGENTO_BP . '/composer.json';
+        $composerFilePath = $this->composerConfigFileDir . '/composer.json';
         $fileContent = file_get_contents($composerFilePath);
         $fileJsonFormat = json_decode($fileContent, true);
         $key = 'replace';
@@ -143,7 +143,7 @@ class ComposerManager
     {
         $repositoryType = 'composer';
         $repositoryUrl = 'http://packages.magento.com/';
-        $composerFilePath = MAGENTO_BP . '/composer.json';
+        $composerFilePath = $this->composerConfigFileDir . '/composer.json';
         $fileContent = file_get_contents($composerFilePath);
         $fileJsonFormat = json_decode($fileContent, true);
         $key = 'repositories';
