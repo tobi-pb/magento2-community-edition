@@ -59,7 +59,7 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
 
     public function testReadFileDoesNotExist()
     {
-        $invalidFilePath = '';
+        $invalidFilePath = 'invalidpath';
         $reader = new \Magento\Update\Queue\Reader($invalidFilePath);
         $actualQueueFileContent = $reader->read();
         $expectedQueueFileContent = '';
