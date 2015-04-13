@@ -79,8 +79,10 @@ class ComposerManager
             if (!isset($param[self::PACKAGE_NAME]) || !isset($param[self::PACKAGE_VERSION])) {
                 throw new \RuntimeException('Incorrect/missing parameters for composer directive "require"');
             }
+            $this->removeReplaceDirective($param[self::PACKAGE_NAME]);
             $commandParams .= $param[self::PACKAGE_NAME] . ':' . $param[self::PACKAGE_VERSION] . ' ';
         }
+        $this->addPackageRepository();
         $commandParams .= ' --no-update';
         return $this->runComposerCommand(self::COMPOSER_REQUIRE, $commandParams);
     }
@@ -109,5 +111,59 @@ class ComposerManager
             throw new \RuntimeException(sprintf('Command "%s" failed: %s', $fullCommand, join("\n", $output)));
         }
         return true;
+    }
+
+    /**
+     * Remove replace directive in composer config file
+     *
+     * @param string $packageName
+     * @return void
+     */
+    protected function removeReplaceDirective($packageName)
+    {
+        $composerFilePath = MAGENTO_BP . '/composer.json';
+        $fileContent = file_get_contents($composerFilePath);
+        $fileJsonFormat = json_decode($fileContent, true);
+        $key = 'replace';
+        if (array_key_exists($key, $fileJsonFormat)) {
+            if (array_key_exists($packageName, $fileJsonFormat[$key])) {
+                unset($fileJsonFormat[$key][$packageName]);
+            }
+            $newFileContent = json_encode($fileJsonFormat, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            file_put_contents($composerFilePath, $newFileContent . "\n");
+        }
+    }
+
+    /**
+     * Add Magento composer repository to composer config file
+     *
+     * @return void
+     */
+    protected function addPackageRepository()
+    {
+        $repositoryType = 'composer';
+        $repositoryUrl = 'http://packages.magento.com/';
+        $composerFilePath = MAGENTO_BP . '/composer.json';
+        $fileContent = file_get_contents($composerFilePath);
+        $fileJsonFormat = json_decode($fileContent, true);
+        $key = 'repositories';
+        if (array_key_exists($key, $fileJsonFormat)) {
+            $flag = false;
+            foreach ($fileJsonFormat[$key] as $repository) {
+                if ($repository['type'] == $repositoryType && $repository['url'] == $repositoryUrl) {
+                    $flag = true;
+                    break;
+                }
+            }
+            if ($flag === false) {
+                $fileJsonFormat[$key][] = ['type' => $repositoryType, 'url' => $repositoryUrl];
+                $newFileContent = json_encode($fileJsonFormat, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                file_put_contents($composerFilePath, $newFileContent . "\n");
+            }
+        } else {
+            $fileJsonFormat[$key][] = ['type' => $repositoryType, 'url' => $repositoryUrl];
+            $newFileContent = json_encode($fileJsonFormat, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            file_put_contents($composerFilePath, $newFileContent . "\n");
+        }
     }
 }
