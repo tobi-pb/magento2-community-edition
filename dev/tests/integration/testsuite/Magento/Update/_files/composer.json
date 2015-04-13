@@ -13,6 +13,9 @@
     "require-dev": {
         "phpunit/phpunit": "4.1.0"
     },
+    "replace": {
+      "magento/module-admin-notification": "self.version"
+    },
     "autoload": {
         "psr-4": {
             "Magento\\": "app/code/Magento/"

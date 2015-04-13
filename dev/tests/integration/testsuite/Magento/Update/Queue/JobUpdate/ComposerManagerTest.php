@@ -68,4 +68,33 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
         $composerManager = new ComposerManager($this->composerConfigFileDir);
         $composerManager->updateComposerConfigFile('require', $expectedRequireDirectiveParam);
     }
+
+    public function testUpdateComposerConfigFileAddNewDependency()
+    {
+        $testPackageName = 'magento/module-admin-notification';
+        $testPackageVersion = '0.74.0-beta2';
+        $expectedRequireDirectiveParam = [
+            [
+                ComposerManager::PACKAGE_NAME => $testPackageName,
+                ComposerManager::PACKAGE_VERSION => $testPackageVersion
+            ]
+        ];
+        $composerManager = new ComposerManager($this->composerConfigFileDir);
+        $composerManager->updateComposerConfigFile('require', $expectedRequireDirectiveParam);
+        $fileJsonFormat = json_decode(file_get_contents($this->composerConfigFilePath), true);
+
+        // Assert that dependency is removed from "replace"
+        $this->assertEmpty($fileJsonFormat['replace']);
+
+        // Assert that dependency is added to "require"
+        $actualRequireDirective = $fileJsonFormat['require'];
+        $this->assertTrue(array_key_exists($testPackageName, $actualRequireDirective));
+        $this->assertEquals($testPackageVersion, $actualRequireDirective[$testPackageName]);
+
+        // Assert that Magento composer repository is added to the test composer config file
+        $this->assertTrue(array_key_exists('repositories', $fileJsonFormat));
+        $actualRepository = $fileJsonFormat['repositories'][0];
+        $this->assertEquals('composer', $actualRepository['type']);
+        $this->assertEquals('http://packages.magento.com/', $actualRepository['url']);
+    }
 }
