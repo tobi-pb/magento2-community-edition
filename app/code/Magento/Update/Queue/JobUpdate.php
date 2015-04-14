@@ -6,10 +6,10 @@
 
 namespace Magento\Update\Queue;
 
-use \Magento\Update\Queue\JobUpdate\ComposerManager;
-use \Magento\Update\Backup;
-use \Magento\Update\Rollback;
-use \Magento\Update\MaintenanceMode;
+use Magento\Update\Queue\JobUpdate\ComposerManager;
+use Magento\Update\Backup;
+use Magento\Update\Rollback;
+use Magento\Update\MaintenanceMode;
 
 /**
  * Magento updater application 'update' job.
@@ -88,6 +88,8 @@ class JobUpdate extends AbstractJob
 
     /**
      * Flash filesystem caches
+     *
+     * @return void
      */
     protected function flushMagentoCache()
     {
