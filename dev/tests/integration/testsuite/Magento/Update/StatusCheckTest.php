@@ -63,6 +63,7 @@ class StatusCheckTest extends \PHPUnit_Framework_TestCase
         $this->status->setUpdateInProgress($isInProgress);
         $actualResponse = json_decode($this->getResponse(self::REQUEST_TYPE_AJAX), true);
 
+        $this->assertInternalType('array', $actualResponse);
         $this->assertArrayHasKey('statusMessage', $actualResponse);
         $this->assertArrayHasKey('isUpdateInProgress', $actualResponse);
         $this->assertContains($this->uniqueMessage, $actualResponse['statusMessage']);
@@ -94,7 +95,6 @@ class StatusCheckTest extends \PHPUnit_Framework_TestCase
      */
     protected function getResponse($requestType = null)
     {
-        $serverAjax = $_SERVER['HTTP_X_REQUESTED_WITH'];
         if ($requestType === self::REQUEST_TYPE_AJAX) {
             $_SERVER['HTTP_X_REQUESTED_WITH'] = 'xmlhttprequest';
         }
@@ -102,7 +102,7 @@ class StatusCheckTest extends \PHPUnit_Framework_TestCase
         include $this->indexScript;
         $response = ob_get_contents();
         ob_end_clean();
-        $_SERVER['HTTP_X_REQUESTED_WITH'] = $serverAjax;
+        unset($_SERVER['HTTP_X_REQUESTED_WITH']);
         return $response;
     }
 }
