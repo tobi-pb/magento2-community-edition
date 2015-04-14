@@ -67,9 +67,9 @@ class CronTest extends \PHPUnit_Framework_TestCase
             unlink($this->backupToRemoveB);
         }
         array_map('unlink', glob(UPDATER_BP . '/var/backup/*.zip'));
-        if (is_dir(is_dir(TESTS_TEMP_DIR . '/var/backup'))) {
-            rmdir(is_dir(TESTS_TEMP_DIR . '/var/backup'));
-            rmdir(is_dir(TESTS_TEMP_DIR . '/var'));
+        if (is_dir(TESTS_TEMP_DIR . '/var/backup')) {
+            rmdir(TESTS_TEMP_DIR . '/var/backup');
+            rmdir(TESTS_TEMP_DIR . '/var');
         }
     }
 
