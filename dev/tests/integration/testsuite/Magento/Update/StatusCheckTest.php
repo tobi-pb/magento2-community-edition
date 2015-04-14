@@ -7,6 +7,8 @@ namespace Magento\Update;
 
 class StatusCheckTest extends \PHPUnit_Framework_TestCase
 {
+    const REQUEST_TYPE_AJAX = 'ajax';
+
     /**
      * @var string
      */
@@ -17,16 +19,23 @@ class StatusCheckTest extends \PHPUnit_Framework_TestCase
      */
     protected $status;
 
+    /**
+     * @var string
+     */
+    protected $uniqueMessage;
+
     protected function setUp()
     {
         $this->indexScript = UPDATER_BP . '/index.php';
         $this->status = new \Magento\Update\Status();
         $this->status->clear();
+        $this->uniqueMessage = 'Test Message' . uniqid();
     }
 
     protected function tearDown()
     {
         $this->status->clear();
+        unset($this->uniqueMessage);
     }
 
     /**
@@ -36,12 +45,29 @@ class StatusCheckTest extends \PHPUnit_Framework_TestCase
      */
     public function testStatusCheck($isInProgress, $statusMessage)
     {
-        $uniqueMessage = 'Test Message' . uniqid();
-        $this->status->add($uniqueMessage);
+        $this->status->add($this->uniqueMessage);
         $this->status->setUpdateInProgress($isInProgress);
-        $actualResponse = shell_exec('php -f ' . $this->indexScript);
-        $this->assertContains($uniqueMessage, $actualResponse);
+        $actualResponse = $this->getResponse();
+
+        $this->assertContains($this->uniqueMessage, $actualResponse);
         $this->assertContains($statusMessage, $actualResponse);
+    }
+
+    /**
+     * @param bool $isInProgress
+     * @param string $statusMessage
+     * @dataProvider progressStatusDataProvider
+     */
+    public function testStatusCheckAjax($isInProgress)
+    {
+        $this->status->add($this->uniqueMessage);
+        $this->status->setUpdateInProgress($isInProgress);
+        $actualResponse = json_decode($this->getResponse(self::REQUEST_TYPE_AJAX), true);
+
+        $this->assertArrayHasKey('statusMessage', $actualResponse);
+        $this->assertArrayHasKey('isUpdateInProgress', $actualResponse);
+        $this->assertContains($this->uniqueMessage, $actualResponse['statusMessage']);
+        $this->assertEquals($isInProgress, $actualResponse['isUpdateInProgress']);
     }
 
     /**
@@ -61,5 +87,23 @@ class StatusCheckTest extends \PHPUnit_Framework_TestCase
                 'statusMessage' => 'Update application is NOT running'
             ],
         ];
+    }
+
+    /**
+     * Return response of index.php, according to the request type
+     * @param string|null $requestType
+     * @return string
+     */
+    protected function getResponse($requestType = null)
+    {
+        if ($requestType === self::REQUEST_TYPE_AJAX) {
+            $_SERVER['HTTP_X_REQUESTED_WITH'] = 'xmlhttprequest';
+        }
+        ob_start();
+        include $this->indexScript;
+        $response = ob_get_contents();
+        ob_end_clean();
+        unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+        return $response;
     }
 }

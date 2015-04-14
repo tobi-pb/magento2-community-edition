@@ -17,7 +17,7 @@ if (!$statusMessage) {
     $statusMessage = 'Please wait for job processing to start.';
 }
 $statusMessage = str_replace("\n", "<br />", $statusMessage);
-$isUpdateInProgress = (bool)rand(0, 1);
+//$isUpdateInProgress = (bool)rand(0, 1);
 /** TODO: End of section added for demo */
 
 if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
