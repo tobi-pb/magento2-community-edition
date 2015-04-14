@@ -91,11 +91,13 @@ class StatusCheckTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Return response of index.php, according to the request type
+     *
      * @param string|null $requestType
      * @return string
      */
     protected function getResponse($requestType = null)
     {
+        $serverAjax = $_SERVER['HTTP_X_REQUESTED_WITH'];
         if ($requestType === self::REQUEST_TYPE_AJAX) {
             $_SERVER['HTTP_X_REQUESTED_WITH'] = 'xmlhttprequest';
         }
@@ -103,7 +105,7 @@ class StatusCheckTest extends \PHPUnit_Framework_TestCase
         include $this->indexScript;
         $response = ob_get_contents();
         ob_end_clean();
-        unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+        $_SERVER['HTTP_X_REQUESTED_WITH'] = $serverAjax;
         return $response;
     }
 }
