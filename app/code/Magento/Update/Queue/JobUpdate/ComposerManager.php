@@ -75,14 +75,15 @@ class ComposerManager
     protected function updateRequireDirective(array $params)
     {
         $commandParams = '';
+        $packageList = [];
         foreach ($params as $param) {
             if (!isset($param[self::PACKAGE_NAME]) || !isset($param[self::PACKAGE_VERSION])) {
                 throw new \RuntimeException('Incorrect/missing parameters for composer directive "require"');
             }
-            $this->removeReplaceDirective($param[self::PACKAGE_NAME]);
             $commandParams .= $param[self::PACKAGE_NAME] . ':' . $param[self::PACKAGE_VERSION] . ' ';
+            $packageList[] = $param[self::PACKAGE_NAME];
         }
-        $this->addPackageRepository();
+        $this->removeReplaceDirective($packageList);
         $commandParams .= ' --no-update';
         return $this->runComposerCommand(self::COMPOSER_REQUIRE, $commandParams);
     }
@@ -116,54 +117,25 @@ class ComposerManager
     /**
      * Remove replace directive in composer config file
      *
-     * @param string $packageName
+     * @param string[] $packageList
      * @return void
      */
-    protected function removeReplaceDirective($packageName)
+    protected function removeReplaceDirective($packageList)
     {
-        $composerFilePath = $this->composerConfigFileDir . '/composer.json';
-        $fileContent = file_get_contents($composerFilePath);
-        $fileJsonFormat = json_decode($fileContent, true);
-        $key = 'replace';
-        if (array_key_exists($key, $fileJsonFormat)) {
-            if (array_key_exists($packageName, $fileJsonFormat[$key])) {
-                unset($fileJsonFormat[$key][$packageName]);
-            }
-            $newFileContent = json_encode($fileJsonFormat, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            file_put_contents($composerFilePath, $newFileContent . "\n");
-        }
-    }
-
-    /**
-     * Add Magento composer repository to composer config file
-     *
-     * @return void
-     */
-    protected function addPackageRepository()
-    {
-        $repositoryType = 'composer';
-        $repositoryUrl = 'http://packages.magento.com/';
-        $composerFilePath = $this->composerConfigFileDir . '/composer.json';
-        $fileContent = file_get_contents($composerFilePath);
-        $fileJsonFormat = json_decode($fileContent, true);
-        $key = 'repositories';
-        if (array_key_exists($key, $fileJsonFormat)) {
-            $flag = false;
-            foreach ($fileJsonFormat[$key] as $repository) {
-                if ($repository['type'] == $repositoryType && $repository['url'] == $repositoryUrl) {
-                    $flag = true;
-                    break;
+        if (!empty($packageList)) {
+            $composerFilePath = $this->composerConfigFileDir . '/composer.json';
+            $fileContent = file_get_contents($composerFilePath);
+            $fileJsonFormat = json_decode($fileContent, true);
+            $key = 'replace';
+            if (array_key_exists($key, $fileJsonFormat)) {
+                foreach ($packageList as $packageName) {
+                    if (array_key_exists($packageName, $fileJsonFormat[$key])) {
+                        unset($fileJsonFormat[$key][$packageName]);
+                    }
                 }
-            }
-            if ($flag === false) {
-                $fileJsonFormat[$key][] = ['type' => $repositoryType, 'url' => $repositoryUrl];
                 $newFileContent = json_encode($fileJsonFormat, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
                 file_put_contents($composerFilePath, $newFileContent . "\n");
             }
-        } else {
-            $fileJsonFormat[$key][] = ['type' => $repositoryType, 'url' => $repositoryUrl];
-            $newFileContent = json_encode($fileJsonFormat, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            file_put_contents($composerFilePath, $newFileContent . "\n");
         }
     }
 }

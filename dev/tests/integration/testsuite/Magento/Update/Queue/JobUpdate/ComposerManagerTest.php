@@ -90,11 +90,5 @@ class ComposerManagerTest extends \PHPUnit_Framework_TestCase
         $actualRequireDirective = $fileJsonFormat['require'];
         $this->assertTrue(array_key_exists($testPackageName, $actualRequireDirective));
         $this->assertEquals($testPackageVersion, $actualRequireDirective[$testPackageName]);
-
-        // Assert that Magento composer repository is added to the test composer config file
-        $this->assertTrue(array_key_exists('repositories', $fileJsonFormat));
-        $actualRepository = $fileJsonFormat['repositories'][0];
-        $this->assertEquals('composer', $actualRepository['type']);
-        $this->assertEquals('http://packages.magento.com/', $actualRepository['url']);
     }
 }
