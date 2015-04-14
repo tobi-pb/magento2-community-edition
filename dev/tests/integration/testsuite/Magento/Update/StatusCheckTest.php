@@ -55,7 +55,6 @@ class StatusCheckTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $isInProgress
-     * @param string $statusMessage
      * @dataProvider progressStatusDataProvider
      */
     public function testStatusCheckAjax($isInProgress)
@@ -71,8 +70,6 @@ class StatusCheckTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Return status info
-     *
      * @return array
      */
     public function progressStatusDataProvider()
