@@ -35,17 +35,14 @@ class CronTest extends \PHPUnit_Framework_TestCase
      */
     protected $status;
 
-    public function __construct()
+    protected function setUp()
     {
         $this->cronScript = UPDATER_BP . '/cron.php';
         $this->backupToRollback = TESTS_TEMP_DIR . '/var/backup/BackupToRollback.zip';
         $this->backupToRemoveA = TESTS_TEMP_DIR . '/var/backup/BackupToRemoveA.zip';
         $this->backupToRemoveB = TESTS_TEMP_DIR . '/var/backup/BackupToRemoveB.zip';
         $this->status = new \Magento\Update\Status();
-    }
 
-    public function setup()
-    {
         if (!is_dir(TESTS_TEMP_DIR . '/var/backup')) {
             mkdir(TESTS_TEMP_DIR . '/var/backup', 0777, true);
         }
@@ -54,7 +51,7 @@ class CronTest extends \PHPUnit_Framework_TestCase
         file_put_contents($this->backupToRemoveB, 'w');
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->status->setUpdateInProgress(false);
         if (file_exists($this->backupToRollback)) {
