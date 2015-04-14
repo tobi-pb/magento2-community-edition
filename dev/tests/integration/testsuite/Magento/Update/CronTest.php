@@ -46,6 +46,9 @@ class CronTest extends \PHPUnit_Framework_TestCase
 
     public function setup()
     {
+        if (!is_dir(TESTS_TEMP_DIR . '/var/backup')) {
+            mkdir(TESTS_TEMP_DIR . '/var/backup', 0777, true);
+        }
         file_put_contents($this->backupToRollback, 'w');
         file_put_contents($this->backupToRemoveA, 'w');
         file_put_contents($this->backupToRemoveB, 'w');
@@ -64,6 +67,10 @@ class CronTest extends \PHPUnit_Framework_TestCase
             unlink($this->backupToRemoveB);
         }
         array_map('unlink', glob(UPDATER_BP . '/var/backup/*.zip'));
+        if (is_dir(is_dir(TESTS_TEMP_DIR . '/var/backup'))) {
+            rmdir(is_dir(TESTS_TEMP_DIR . '/var/backup'));
+            rmdir(is_dir(TESTS_TEMP_DIR . '/var'));
+        }
     }
 
     public function testUpdateInProgress()
