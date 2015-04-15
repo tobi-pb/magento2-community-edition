@@ -43,8 +43,7 @@ class JobFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(
             '\RuntimeException',
-            '"invalid" job is not supported. The following jobs are supported: '
-            . 'update, backup, rollback, remove_backups.'
+            '"invalid" job is not supported.'
         );
         $this->jobFactory->create('invalid', []);
     }

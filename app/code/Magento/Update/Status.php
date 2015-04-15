@@ -62,7 +62,7 @@ class Status
         $this->logFilePath = $logFilePath ? $logFilePath : UPDATER_BP . '/var/update_status.log';
         $this->updateInProgressFlagFilePath = $updateInProgressFlagFilePath
             ? $updateInProgressFlagFilePath
-            : UPDATER_BP . '/var/.update_in_progress.flag';
+            : MAGENTO_BP . '/var/.update_in_progress.flag';
         $this->updateErrorFlagFilePath = $updateErrorFlagFilePath
             ? $updateErrorFlagFilePath
             : MAGENTO_BP . '/var/.update_error.flag';

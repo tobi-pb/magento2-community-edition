@@ -44,23 +44,7 @@ class JobFactory
                 return new JobRemoveBackups($name, $params);
                 break;
             default:
-                throw new \RuntimeException(
-                    sprintf(
-                        '"%s" job is not supported. The following jobs are supported: %s.',
-                        $name,
-                        implode(', ', self::getListOfSupportedJobs())
-                    )
-                );
+                throw new \RuntimeException(sprintf('"%s" job is not supported.', $name));
         }
-    }
-
-    /**
-     * Get list of jobs by updater application.
-     *
-     * @return string[]
-     */
-    public static function getListOfSupportedJobs()
-    {
-        return [self::NAME_UPDATE, self::NAME_BACKUP, self::NAME_ROLLBACK, self::NAME_REMOVE_BACKUPS];
     }
 }
