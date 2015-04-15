@@ -6,8 +6,6 @@
 
 namespace Magento\Update;
 
-use Magento\Update\Status;
-
 /**
  * Class for rollback capabilities
  */
@@ -105,7 +103,7 @@ class Rollback
                 sprintf('Error happened during execution of command "%s": %s', $command, implode("\n", $output))
             );
         }
-        $this->status->add('Backup of Magento code was successfully created: "%s"', $backupFilePath);
+        $this->status->add(sprintf('Backup of Magento code was successfully restored: "%s"', $backupFilePath));
         return $this;
     }
 }
