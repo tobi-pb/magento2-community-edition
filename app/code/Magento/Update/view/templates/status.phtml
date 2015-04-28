@@ -1,0 +1,32 @@
+<?php
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+/** @var string $statusMessage */
+/** @var bool $isUpdateInProgress */
+?>
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="description" content="Magento update status page"/>
+    <title>Magento update</title>
+    <link rel="stylesheet" type="text/css" href="pub/css/status.css"/>
+    <link rel="shortcut icon" type="image/x-icon" href="pub/favicon.ico"/>
+    <script type="text/javascript" src="pub/js/lib/jquery.js"></script>
+    <script type="text/javascript" src="pub/js/status.js"></script>
+</head>
+<body>
+<h3>Magento update status:</h3>
+
+<h3>
+    <div id="status">
+        <?php echo $isUpdateInProgress ? "Update application is running" : "Update application is NOT running" ?>
+    </div>
+</h3>
+
+<div id="status-message"><?php echo $statusMessage ?></div>
+</body>
+</html>
