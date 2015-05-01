@@ -38,8 +38,8 @@ class BackupInfo
      */
     public function generateBackupFilename()
     {
-        $currentDate = date('Y-m-d-H-i-s', time());
-        return 'backup-' . $currentDate . '-' . date_default_timezone_get() . '.zip';
+        $currentDate = gmdate('Y-m-d-H-i-s', time());
+        return 'backup-' . $currentDate . '.zip';
     }
 
     /**
