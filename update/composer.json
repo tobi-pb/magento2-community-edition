@@ -2,7 +2,7 @@
     "name": "magento/updater",
     "description": "Magento Updater",
     "type": "project",
-    "version": "0.74.0-beta2",
+    "version": "0.74.0-beta8",
     "license": [
         "OSL-3.0",
         "AFL-3.0"
